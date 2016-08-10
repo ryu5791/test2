@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="js/jquery-ui.css">
+<script src="js/jquery-ui.js"></script>
+  <!-- JavaScript SDKの読み込みを設定 -->
+    <script src="js/ncmb.min.js"></script>
+    <script>
+        ons.bootstrap();
+    </script>
+    <!-- JavaScriptの読み込みを設定 -->
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <ons-sliding-menu var="app.slidingMenu" menu-page="menu.html" main-page="page1.html" side="left" type="overlay" max-slide-distance="200px">
+    </ons-sliding-menu>
+</body>
+</html> 

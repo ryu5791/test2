@@ -1,0 +1,26 @@
+<ons-navigator>
+ <ons-page>
+     <ons-toolbar>
+         <div class="left">
+             <ons-toolbar-button ng-click="ons.slidingMenu.toggleMenu()"><ons-icon icon="bars"></ons-icon></ons-toolbar-button>
+         </div>
+         <!-- ツールバーの文言を変更 -->
+         <div class="center">データ保存</div>
+     </ons-toolbar>
+
+     <div style="text-align: center">
+         <!-- タイトルの文言を変更 -->
+         <h1>データ保存</h1>
+         <!-- ボタンがクリックされた時にsaveDataメソッドを呼び出す -->
+         <ons-button onclick="saveData()">
+             データを保存する
+         </ons-button>
+         <div id="message"></div>
+         <!-- < input type="text" name="address" value="" /> -->
+        <!--input id="txtKeywd" type="search" size="20" maxlengh="50" /-->
+    <input id="autocomplete" title="type &quot;a&quot;">
+
+</div>
+
+ </ons-page>
+</ons-navigator>

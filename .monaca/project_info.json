@@ -1,0 +1,28 @@
+{
+    "plugins": [
+        "mobi.monaca.plugins.Monaca"
+    ],
+    "framework_version": "3.5",
+    "xcode_version": "6",
+    "cordova_version": "5.2",
+    "plugin_settings": {
+        "cordova-plugin-whitelist": {
+            "variables": [
+                "API_KEY=393df630e14da8cd6fae4850b326ed3abf88afb2ab3067dc858ce24ddb9bbb9c"
+            ]
+        }
+    },
+    "external_plugins": [
+        "cordova-plugin-whitelist@1.0.0",
+        "cordova-plugin-splashscreen@2.1.0"
+    ],
+    "title-ja": "",
+    "title-en": "",
+    "description-ja": "",
+    "description-en": "",
+    "category": "User Template",
+    "platform": [
+        "winrt"
+    ],
+    "name": "generated-1467832592-56b82c5cfd1734b432032bef"
+}

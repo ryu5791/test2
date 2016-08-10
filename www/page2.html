@@ -1,0 +1,27 @@
+<ons-page>
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button ng-click="app.slidingMenu.toggleMenu()"><ons-icon icon="bars"></ons-icon></ons-toolbar-button>
+        </div>
+    <!-- ツールバーの文言を変更 -->
+        <div class="center">会員登録してみる</div>
+    </ons-toolbar>
+
+    <div style="text-align: center">
+    <!-- タイトルの文言を変更 -->
+        <h1>会員登録してみる</h1>
+        <p>
+        <!-- ユーザー名とパスワードを入力するテキストボックスを用意 -->
+            ユーザー名<br/>
+            <input type="text" id="user_name"/><br/>
+            パスワード<br/>
+            <input type="text" id="password"/><br/>
+        </p>
+    <!-- 会員登録するボタンが押されたらloginメソッドを呼び出す -->
+        <ons-button onclick="login()">会員登録する</ons-button>
+
+    <!-- ログインしている会員のユーザー名を表示する段落を用意 -->
+        <p id="current_user">
+        </p>
+    </div>
+</ons-page>
