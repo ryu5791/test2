@@ -3,25 +3,27 @@ var ncmb = new NCMB("393df630e14da8cd6fae4850b326ed3abf88afb2ab3067dc858ce24ddb9
 
 //データをmobile backendに保存するメソッド
 function saveData(){
-    //クラス名を指定して新規クラスを作成
-    var Data = ncmb.DataStore("Data");
 
-    //Dataクラスのインスタンスを作成
-    var data = new Data();
-
-    //作成したインスタンスのaisatsuというフィールドに文字データを設定
-    data.set("aisatsu", "hello, world!");
-
-    //設定したデータをmobile backendに保存
-    data.save()
-        .then(function(object) {
-              //成功する時の処理
-              $("#message").html("<p>データ保存に成功!</p>");
-          })
-        .catch(function(error) {
-              //エラーが発生する時の処理
-              $("#message").html("error:" + error.message);          
-          });
+    alert("test");
+//    //クラス名を指定して新規クラスを作成
+//    var Data = ncmb.DataStore("Data");
+//
+//    //Dataクラスのインスタンスを作成
+//    var data = new Data();
+//
+//    //作成したインスタンスのaisatsuというフィールドに文字データを設定
+//    data.set("aisatsu", "hello, world!");
+//
+//    //設定したデータをmobile backendに保存
+//    data.save()
+//        .then(function(object) {
+//              //成功する時の処理
+//              $("#message").html("<p>データ保存に成功!</p>");
+//          })
+//        .catch(function(error) {
+//              //エラーが発生する時の処理
+//              $("#message").html("error:" + error.message);          
+//          });
 } 
 
 //mobile backendへの会員登録を行うメソッド
