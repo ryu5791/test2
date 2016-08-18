@@ -1,10 +1,22 @@
 //mobile backendのAPIキーを設定
-var ncmb = new NCMB("393df630e14da8cd6fae4850b326ed3abf88afb2ab3067dc858ce24ddb9bbb9c","d7051f8f5d410f7added420e088715b687a7429a74cf5ad31e7aabaa516d13a9");
+var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
 
 //データをmobile backendに保存するメソッド
 function saveData(){
 
-    alert("test");
+    var Score = ncmb.DataStore("Score2016_2");
+    
+    Score   .order("date")
+            .count()
+            .fetchAll()
+            .then(function(results){
+                var i;
+                makeDailyManageTbl(results.count);
+            })
+            .catch(function(err){
+                alert("err1:"+err);
+            })
+    
 //    //クラス名を指定して新規クラスを作成
 //    var Data = ncmb.DataStore("Data");
 //
@@ -25,6 +37,116 @@ function saveData(){
 //              $("#message").html("error:" + error.message);          
 //          });
 } 
+
+// 日毎管理テーブル作成 //
+function makeDailyManageTbl(totalNum)
+{
+    var tblInfo = new Object();
+    
+    tblInfo.ptrNum = 0;
+    tblInfo.bkDate = "";
+    tblInfo.totalDate = 0;
+    tblInfo.scoreNum = 0;
+    
+    makeDailyManageTbl_per100(totalNum, tblInfo);
+
+/*
+    var bkDate;
+    var totalDate = 0;
+    var scoreNum = 0;
+    var i;
+    
+    alert(scoreRslt[i].date + "  " + scoreRslt.count)
+    
+    for(i=0; i<scoreRslt.count; i++)
+    {
+        scoreNum++;
+        if(bkDate != scoreRslt[i].date)
+        {
+//            if(totalDate != 0)
+//            {
+//                saveDailyDate( scoreRslt[i].date, scoreNum/4 );
+//            }
+            totalDate++;
+            scoreNum=0;
+            bkDate = scoreRslt[i].date;
+        }
+        
+//        if(i==(scoreRslt.count-1))
+//        {
+//            saveDailyDate( scoreRslt[i].date, scoreNum/4 );
+//        }
+    }
+
+    alert("totalDate = " + totalDate);
+*/
+}
+
+// 日毎管理テーブル作成 100ずつ //
+function makeDailyManageTbl_per100(totalNum, tblInfo)
+{
+    var Score = ncmb.DataStore("Score2016_2");
+
+    Score   .order("date")
+            .skip(tblInfo.ptrNum)
+            .fetchAll()
+            .then(function(results){
+                var i;
+                for(i=0; i<results.length; i++)
+                {
+                    tblInfo.scoreNum++;
+                    if(tblInfo.bkDate != results[i].date)
+                    {
+                        if(tblInfo.totalDate != 0){
+                            saveDailyDate( tblInfo.bkDate, tblInfo.scoreNum/4, false );
+                        }
+                        tblInfo.totalDate++;
+                        tblInfo.scoreNum=0;
+                        tblInfo.bkDate = results[i].date;
+                    }
+                }
+                // 終了確認 //
+                tblInfo.ptrNum += results.length;
+                if(tblInfo.ptrNum == totalNum)
+                {
+                    tblInfo.scoreNum++;
+                    saveDailyDate( tblInfo.bkDate, tblInfo.scoreNum/4, true );
+                    alert("tblInfo.totalDate = " + tblInfo.totalDate);
+                }
+                else
+                {
+                    makeDailyManageTbl_per100(totalNum, tblInfo);
+                }
+            })
+            .catch(function(err){
+                alert("err2:"+err);
+            })
+
+
+
+}
+
+
+
+
+function saveDailyDate( date, game, finalDt )
+{
+    var DailyStore = ncmb.DataStore("DailyManageTbl");
+    var dailyStore = new DailyStore();
+    
+    dailyStore  .set("date", date)
+                .set("gameNum", game)
+                .save()
+                .then(function(dailyStore){
+                    if(finalDt == true)
+                    {
+                        alert("complete!");
+                    }
+                })
+    
+}
+
+
 
 //mobile backendへの会員登録を行うメソッド
 function login (){
