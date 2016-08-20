@@ -1,16 +1,23 @@
 //mobile backendのAPIキーを設定
-var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
+//↓本番
+//var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
+//↓テスト
+var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
+
+const ThisScoreTbl = "Score2016_2";
 
 //データをmobile backendに保存するメソッド
 function saveData(){
 
-    var Score = ncmb.DataStore("Score2016_2");
+
+
+    var Score = ncmb.DataStore( ThisScoreTbl );
     
     Score   .order("date")
             .count()
             .fetchAll()
             .then(function(results){
-                var i;
+                alert("results.count : "+results.count);
                 makeDailyManageTbl(results.count);
             })
             .catch(function(err){
@@ -41,14 +48,68 @@ function saveData(){
 // 日毎管理テーブル作成 //
 function makeDailyManageTbl(totalNum)
 {
+    var Score = ncmb.DataStore( ThisScoreTbl );
+    var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
+    var totalTbl = new TotalTbl();
+    var DailyStore = ncmb.DataStore("DailyManageTbl");
+    var dailyStore = new DailyStore();
     var tblInfo = new Object();
-    
-    tblInfo.ptrNum = 0;
-    tblInfo.bkDate = "";
-    tblInfo.totalDate = 0;
-    tblInfo.scoreNum = 0;
-    
-    makeDailyManageTbl_per100(totalNum, tblInfo);
+    var ScoreLatest;
+    var manageLatest;
+        Score   .order("updateDate", true)
+                .count()
+                .limit(1)
+                .fetchAll()
+                .then(function(resultScore){
+                    ScoreLatest = resultScore[0].updateDate;
+    alert("ScoreLatest: "+ ScoreLatest);
+                    TotalTbl.fetchAll()
+                            .then(function(resultManage){
+                                if( ChkDailyRefresh(ScoreLatest, resultManage) == true )
+//                                if((resultManage.length == 0) || (ScoreLatest != resultManage[0].latest))
+//                                manageLatest = resultManage[0].latest;
+//                                if(ScoreLatest != manageLatest)
+                                {
+                                    totalTbl.set("latest", ScoreLatest)
+                                            .save()
+                                            .then(function(resultSave){
+                                                
+                                            })
+                                            .catch(function(err){
+                                                    alert("makeDailyManageTbl save Err :" + err);
+                                            });
+                                    DailyStore  .fetchAll()
+                                                .then(function(resultDelete){
+                                                    var i;
+                                                    for(i=0; i<resultDelete.length; i++){
+                                                        resultDelete[i].delete();
+                                                    }
+                                                    tblInfo.ptrNum = 0;
+                                                    tblInfo.bkDate = "";
+                                                    tblInfo.totalDate = 0;
+                                                    tblInfo.scoreNum = 0;
+                                                    
+                                                    makeDailyManageTbl_per100(totalNum, tblInfo);
+                                                })
+                                                .catch(function(err){
+                                                    alert("makeDailyManageTbl delete Err :" + err);
+                                                });
+                                    
+                                }
+                                else
+                                {
+                                    alert("更新なし");
+                                }
+                            })
+                            .catch(function(err){
+                                alert("makeDailyManageTbl2 Err :" + err);
+                            })
+
+                })
+                .catch(function(err){
+                    alert("makeDailyManageTbl Err :" + err);
+                })
+
 
 /*
     var bkDate;
@@ -82,10 +143,29 @@ function makeDailyManageTbl(totalNum)
 */
 }
 
+function ChkDailyRefresh(ScoreLatest, resultManage)
+{
+    var ret = false;
+    
+    if(resultManage.length == 0)
+    {
+        ret = true;
+    }
+    else
+    if(ScoreLatest != resultManage[0].latest)
+    {
+        resultManage[0].delete();
+        ret = true;
+    }
+    
+    return ret;
+}
+
+
 // 日毎管理テーブル作成 100ずつ //
 function makeDailyManageTbl_per100(totalNum, tblInfo)
 {
-    var Score = ncmb.DataStore("Score2016_2");
+    var Score = ncmb.DataStore(ThisScoreTbl);
 
     Score   .order("date")
             .skip(tblInfo.ptrNum)
