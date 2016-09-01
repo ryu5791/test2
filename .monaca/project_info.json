@@ -16,13 +16,11 @@
         "cordova-plugin-whitelist@1.0.0",
         "cordova-plugin-splashscreen@2.1.0"
     ],
-    "title-ja": "",
+    "title-ja": "get_score",
     "title-en": "",
     "description-ja": "",
     "description-en": "",
     "category": "User Template",
-    "platform": [
-        "winrt"
-    ],
-    "name": "generated-1467832592-56b82c5cfd1734b432032bef"
+    "platform": [],
+    "name": "generated-1471992077-56b82c5cfd1734b432032bef"
 }

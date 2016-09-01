@@ -6,6 +6,8 @@ var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7d
 
 const ThisScoreTbl = "Score2016_2";
 
+
+
 //データをmobile backendに保存するメソッド
 function saveData(){
 
