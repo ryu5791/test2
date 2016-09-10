@@ -8,29 +8,34 @@ var showDialog = function(id){
 document.addEventListener("pageinit", function(e) {
   if (e.target.id == "my-page") {
 //    document.getElementById("my-content").innerHTML = "Item A<br>";
-        var onsList = document.getElementById('ons-list');
-        for( var i = 0; i< 5; i++ )
-        {
-            var onsListItem = document.createElement("ons-list");
-            onsListItem.innerHTML = "<ons-row>"+
-                                        "<ons-col class = 'ons-col' width='20px' align='center'>"+
-                                            "<ons-icon class='item-icon' icon='fa fa-building-o' size='20px'></ons-icon>"+
-                                        "</ons-col>"+
-                                        "<ons-col>"+
-                                            "<header>"+
-                                                "<span class='item-title' id='item-title'>"+i+"</span><br>"
-                                            "</header>"+
-                                        "</ons-col>"+
-                                    "</ons-row>"
-            onsList.appendChild(onsListItem);
-            ons.compile(onsListItem);
-            
-        }
+        makeTbl();
         
   }
 }, false);
 
-
+/* 日毎マスター画面作成 */
+function makeDailyMasterDisplay(dailyRslt)
+{
+        var onsList = document.getElementById('ons-list');
+        for( var i = 0; i< dailyRslt.length; i++ )
+        {
+            var onsListItem = document.createElement("ons-list");
+//              var onsListItem = document.createElement("my-content");
+            onsListItem.innerHTML = "<ons-row onclick=alert("+"'OK!'"+")>"+
+                                        "<ons-col>"+
+                                            "<header>"+dailyRslt[i].date
+                                                    +" 試合数："
+                                                    +dailyRslt[i].gameNum
+                                                    +
+                                            "</header>"+
+                                        "</ons-col>"+
+                                    "</ons-row>";
+            onsList.appendChild(onsListItem);
+            ons.compile(onsListItem);
+            
+        }
+    
+}
 
 
 /*
