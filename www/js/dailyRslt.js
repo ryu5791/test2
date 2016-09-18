@@ -8,7 +8,10 @@ var showDialog = function(id){
 document.addEventListener("pageinit", function(e) {
   if (e.target.id == "my-page") {
 //    document.getElementById("my-content").innerHTML = "Item A<br>";
-        makeTbl();
+        makeDailyTbl();
+        
+  }else if(e.target.id == "detail.html")
+  {
         
   }
 }, false);
@@ -20,8 +23,9 @@ function makeDailyMasterDisplay(dailyRslt)
         for( var i = 0; i< dailyRslt.length; i++ )
         {
             var onsListItem = document.createElement("ons-list");
+            $rslt = dailyRslt[i];
 //              var onsListItem = document.createElement("my-content");
-            onsListItem.innerHTML = "<ons-row onclick=alert("+"'OK!'"+")>"+
+            onsListItem.innerHTML = "<ons-row onclick = 'goToDailyDetailDisplay($rslt)'>" +
                                         "<ons-col>"+
                                             "<header>"+dailyRslt[i].date
                                                     +" 試合数："
@@ -37,26 +41,8 @@ function makeDailyMasterDisplay(dailyRslt)
     
 }
 
-
-/*
-ons.ready(function() {
-
-  var infiniteList = document.getElementById('infinite-list');
-
-  infiniteList.delegate = {
-    createItemContent: function(i) {
-      return ons._util.createElement(
-        '<ons-list-item>Item ' + i + '</ons-list-item>'
-      );
-    },
-    countItems: function() {
-      return 10000;
-    },
-    calculateItemHeight: function() {
-      return ons.platform.isAndroid() ? 48 : 44;
-    }
-  };
-
-  infiniteList.refresh();
-});
-*/
+function goToDailyDetailDisplay(rslt)
+{
+    var options = {param1: rslt};
+    dailyNavi.pushPage("page3.html", options);
+}

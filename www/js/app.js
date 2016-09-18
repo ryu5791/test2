@@ -48,7 +48,7 @@ function saveData(){
 } 
 
 //テーブル作成
-function makeTbl()
+function makeDailyTbl()
 {
     var Score = ncmb.DataStore( ThisScoreTbl );
     
