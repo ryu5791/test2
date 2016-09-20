@@ -26,8 +26,8 @@ function makeDailyMasterDisplay(dailyRslt)
             var onsListItem = document.createElement("ons-list");
             $rslt = dailyRslt[i];
 //              var onsListItem = document.createElement("my-content");
-            onsListItem.innerHTML = "<ons-row onclick = 'goToDailyDetailDisplay($rslt, this)'>" +
-//            onsListItem.innerHTML = "<ons-row onclick = '(function(){$tmpRslt=$rslt;goToDailyDetailDisplay($tmpRslt);})'>" +
+//            onsListItem.innerHTML = "<ons-row onclick = 'goToDailyDetailDisplay($rslt, this)'>" +
+            onsListItem.innerHTML = "<ons-row id = dailyRow"+i+">" +
                                         "<ons-col>"+
                                             "<header>"+dailyRslt[i].date
                                                     +" 試合数："
@@ -40,11 +40,20 @@ function makeDailyMasterDisplay(dailyRslt)
             ons.compile(onsListItem);
             
         }
+        
+        for( var i = 0; i< dailyRslt.length; i++ )
+        {
+            (function (n) {
+                $("#dailyRow" + i).click(function(){
+                    goToDailyDetailDisplay(dailyRslt[n]);
+                });
+            })(i);
+        }
     
 }
 
 /* 詳細画面へ移行 */
-function goToDailyDetailDisplay(rslt, obj)
+function goToDailyDetailDisplay(rslt)
 {
     var options = {param1: rslt};
     dailyNavi.pushPage("page3.html", options);
@@ -67,6 +76,10 @@ function makeDetailDisplay(detailRslt)
             name[detailRslt[i].row] = get_NameFromTbl(num);   //★テーブルないとき
 //alert(name[detailRslt[i].row]);
             gamePt[detailRslt[i].row] = detailRslt[i].gamePt;
+        }
+        else
+        {
+            
         }
         
 

@@ -66,7 +66,6 @@ window.onload = function(){
     regMem[53] = new set_regMem(96,"松下","まつした");
     regMem[54] = new set_regMem(301,"大朝J","おおともじ");
     regMem[55] = new set_regMem(95,"澤田","さわだ");
-    regMem[56] = new set_regMem(0,"dummy","dummy");
 };
 
 function set_regMem(id, dispName, nickname){       //
@@ -334,9 +333,9 @@ function getDailyTblInfo()
 /* 詳細画面作成 */
 function makeDetailTbl(rslt)
 {
+alert(g_rslt.date);
     var ptrNum = 0;
     var Score = ncmb.DataStore( ThisScoreTbl );
-alert(rslt.date);
     Score
         .equalTo("date",rslt.date)
         .order("gameNo")
