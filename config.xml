@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns="http://www.w3.org/ns/widgets" id="com.example.helloworld" version="1.0.0">
   <name>mobile backend sample</name>
-  <description/>
+  <description>Made with Monaca (http://monaca.mobi)</description>
   <author/>
   <content src="index.html"/>
   <access origin="*"/>
@@ -39,4 +39,6 @@
   <preference name="monaca:AndroidIsPackageNameSeparate" value="false"/>
   <preference name="monaca:targetFamilyiPhone" value="1"/>
   <preference name="monaca:targetFamilyiPad" value="1"/>
+  <preference name="WindowsStorePublisherName" value="My Name"/>
+  <preference name="WindowsStoreIdentityName" value="0bd2c60e-5da9-5124-f895-2563ffa2f7d5"/>
 </widget>

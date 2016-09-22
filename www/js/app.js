@@ -6,12 +6,12 @@ var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7d
 
 const ThisScoreTbl = "Score2016_2";
 
-var regMem;         // regular member
+var regMem;    		// regular member
 
 window.onload = function(){
-        regMem = new Array();
-    regMem[0] = new set_regMem(1,"岩井","いわい");
-    regMem[1] = new set_regMem(2,"大谷","おおたに");
+		regMem = new Array();
+	regMem[0] = new set_regMem(1,"岩井","いわい");
+	regMem[1] = new set_regMem(2,"大谷","おおたに");
 	regMem[2] = new set_regMem(6,"木村","きむら");
 	regMem[3] = new set_regMem(10,"住野","すみの");
 	regMem[4] = new set_regMem(13,"中川","なかがわ");
@@ -58,92 +58,85 @@ window.onload = function(){
 	regMem[45] = new set_regMem(177,"古田","ふるた");
 	regMem[46] = new set_regMem(277,"南木","なんぼく");
 	regMem[47] = new set_regMem(281,"西崎","にしざき");
-    regMem[48] = new set_regMem(92,"大川","おおかわ");
-    regMem[49] = new set_regMem(93,"平岡","ひらおか");
-    regMem[50] = new set_regMem(66,"荒本","あらもと");
-    regMem[51] = new set_regMem(298,"飯田","いいだ");
-    regMem[52] = new set_regMem(94,"宮本","みやもと");
-    regMem[53] = new set_regMem(96,"松下","まつした");
-    regMem[54] = new set_regMem(301,"大朝J","おおともじ");
-    regMem[55] = new set_regMem(95,"澤田","さわだ");
+	regMem[48] = new set_regMem(92,"大川","おおかわ");
+	regMem[49] = new set_regMem(93,"平岡","ひらおか");
+	regMem[50] = new set_regMem(66,"荒本","あらもと");
+	regMem[51] = new set_regMem(298,"飯田","いいだ");
+	regMem[52] = new set_regMem(94,"宮本","みやもと");
+	regMem[53] = new set_regMem(96,"松下","まつした");
+	regMem[54] = new set_regMem(301,"大朝J","おおともじ");
+	regMem[55] = new set_regMem(95,"澤田","さわだ");
 };
 
-function set_regMem(id, dispName, nickname){       //
-    this.id = id;
-    this.dispName = dispName;
-    this.nickname = nickname;
+function set_regMem(id, dispName, nickname){	   //
+	this.id = id;
+	this.dispName = dispName;
+	this.nickname = nickname;
 }
 
 // IDから名前の取得（内部テーブルから）
 function get_NameFromTbl(idNum){
-    var i;
-    var retStr = null;
-    for(i in regMem){
-        if(regMem[i].id == idNum){
+	var i;
+	var retStr = null;
+	for(i in regMem){
+		if(regMem[i].id == idNum){
 //alert(i);
-            retStr = regMem[i].dispName;
-            break;
-        }
-    }
-    
-    return retStr;
+			retStr = regMem[i].dispName;
+			break;
+		}
+	}
+	
+	return retStr;
 }
 
-//データをmobile backendに保存するメソッド
-function saveData(){
+// IDから名前の取得
+function get_NameFromID(idNum)
+{
+	var Member = ncmb.DataStore("member");
+	var strName = get_NameFromTbl(+idNum);
+	
+	if(strName == null)
+	{
+		strName = "ID:" + idNum;		// ★暫定でID入力
+		Member
+			.equalTo("ID", +idNum)
+			.fetchAll()
+			.then(function(results){
+				var object = results[0];
+
+				if(object.length != 0){
+					strName = object.name;
+					regMem[regMem.length] = new set_regMem(+idNum,strName,"");
+				}else{
+					alert("該当IDがありません");
+					strName = idNum;
+				}
+			})
+			.catch(function(err){
+				alert("該当IDがありません"+err);
+				strName = idNum;
+			});
+	};
+	return( strName );
+}
 
 
-
-    var Score = ncmb.DataStore( ThisScoreTbl );
-    
-    Score   .order("date")
-            .count()
-            .fetchAll()
-            .then(function(results){
-                alert("results.count : "+results.count);
-                makeDailyManageTbl(results.count);
-            })
-            .catch(function(err){
-                alert("err1:"+err);
-            })
-    
-//    //クラス名を指定して新規クラスを作成
-//    var Data = ncmb.DataStore("Data");
-//
-//    //Dataクラスのインスタンスを作成
-//    var data = new Data();
-//
-//    //作成したインスタンスのaisatsuというフィールドに文字データを設定
-//    data.set("aisatsu", "hello, world!");
-//
-//    //設定したデータをmobile backendに保存
-//    data.save()
-//        .then(function(object) {
-//              //成功する時の処理
-//              $("#message").html("<p>データ保存に成功!</p>");
-//          })
-//        .catch(function(error) {
-//              //エラーが発生する時の処理
-//              $("#message").html("error:" + error.message);          
-//          });
-} 
-
-//テーブル作成
+// 日毎テーブル作成
 function makeDailyTbl()
 {
-    var Score = ncmb.DataStore( ThisScoreTbl );
-    
-    Score   .order("date")
-            .count()
-            .fetchAll()
-            .then(function(results){
-//                alert("results.count : "+results.count);
-                makeDailyManageTbl(results.count);
-            })
-            .catch(function(err){
-                alert("err1:"+err);
-            })
-    
+	var Score = ncmb.DataStore( ThisScoreTbl );
+	
+	Score	.order("date")
+			.count()
+			.fetchAll()
+			.then(function(results){
+//				  alert("results.count : "+results.count);
+				makeDailyManageTbl(results.count);
+			})
+			.catch(function(err){
+				alert("err1:"+err);
+			})
+	
 }
 
 
@@ -152,135 +145,137 @@ function makeDailyTbl()
 // 日毎管理テーブル作成 //
 function makeDailyManageTbl(totalNum)
 {
-    var Score = ncmb.DataStore( ThisScoreTbl );
-    var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
-    var totalTbl = new TotalTbl();
-    var DailyStore = ncmb.DataStore("DailyManageTbl");
-    var dailyStore = new DailyStore();
-    var tblInfo = new Object();
-    var ScoreLatest;
-    var manageLatest;
-        Score   .order("updateDate", true)
-                .count()
-                .limit(1)
-                .fetchAll()
-                .then(function(resultScore){
-                    ScoreLatest = resultScore[0].updateDate;
-//    alert("ScoreLatest: "+ ScoreLatest);
-                    TotalTbl.fetchAll()
-                            .then(function(resultManage){
-                                if( ChkDailyRefresh(ScoreLatest, resultManage) == true )    /* リフレッシュありならば */
-//                                if((resultManage.length == 0) || (ScoreLatest != resultManage[0].latest))
-//                                manageLatest = resultManage[0].latest;
-//                                if(ScoreLatest != manageLatest)
-                                {
-                                    totalTbl.set("latest", ScoreLatest)
-                                            .save()
-                                            .then(function(resultSave){
-                                                
-                                            })
-                                            .catch(function(err){
-                                                    alert("makeDailyManageTbl save Err :" + err);
-                                            });
-                                    DailyStore  .fetchAll()
-                                                .then(function(resultDelete){
-                                                    var i;
-                                                    for(i=0; i<resultDelete.length; i++){
-                                                        resultDelete[i].delete();
-                                                    }
-                                                    tblInfo.ptrNum = 0;
-                                                    tblInfo.bkDate = "";
-                                                    tblInfo.totalDate = 0;
-                                                    tblInfo.scoreNum = 0;
-                                                    
-                                                    makeDailyManageTbl_per100(totalNum, tblInfo);
-                                                })
-                                                .catch(function(err){
-                                                    alert("makeDailyManageTbl delete Err :" + err);
-                                                });
-                                    
-                                }
-                                else
-                                {
-                                    //完了!(更新なし)
-//                                    alert("更新なし");
-                                    finishDailyStore();
-                                }
-                            })
-                            .catch(function(err){
-                                alert("makeDailyManageTbl2 Err :" + err);
-                            })
+	var Score = ncmb.DataStore( ThisScoreTbl );
+	var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
+	var totalTbl = new TotalTbl();
+	var DailyStore = ncmb.DataStore("DailyManageTbl");
+	var dailyStore = new DailyStore();
+	var tblInfo = new Object();
+	var ScoreLatest;
+	var manageLatest;
+		Score
+			.order("updateDate", true)
+			.count()
+			.limit(1)
+			.fetchAll()
+			.then(function(resultScore){
+				ScoreLatest = resultScore[0].updateDate;
+				TotalTbl
+					.fetchAll()
+					.then(function(resultManage){
+						if( ChkDailyRefresh(ScoreLatest, resultManage) == true )	/* リフレッシュありならば */
+						{
+							totalTbl
+								.set("dailyLatest", ScoreLatest)					// 日毎更新日時保存
+								.set("rankLatest", resultManage[0].rankLatest)		// その他のデータは保持
+								.save()
+								.then(function(resultSave){
+									
+								})
+								.catch(function(err){
+										alert("makeDailyManageTbl save Err :" + err);
+								});
+							// 削除
+							DailyStore
+								.fetchAll()
+								.then(function(resultDelete){
+									var i;
+									for(i=0; i<resultDelete.length; i++){
+										resultDelete[i].delete();
+									}
+									tblInfo.ptrNum = 0;
+									tblInfo.bkDate = "";
+									tblInfo.totalDate = 0;
+									tblInfo.scoreNum = 0;
+									
+									makeDailyManageTbl_per100(totalNum, tblInfo);
+								})
+								.catch(function(err){
+									alert("makeDailyManageTbl delete Err :" + err);
+								});
+							
+						}
+						else
+						{
+							//完了!(更新なし)
+//							  alert("更新なし");
+							finishDailyStore();
+						}
+					})
+					.catch(function(err){
+						alert("makeDailyManageTbl2 Err :" + err);
+					})
 
-                })
-                .catch(function(err){
-                    alert("makeDailyManageTbl Err :" + err);
-                })
+				})
+				.catch(function(err){
+					alert("makeDailyManageTbl Err :" + err);
+				})
 
 }
 
+// 日毎データ更新チェック
+// true:データなし　又は更新時間が異なる
 function ChkDailyRefresh(ScoreLatest, resultManage)
 {
-    var ret = false;
-    
-    if(resultManage.length == 0)
-    {
-        ret = true;
-    }
-    else
-    if(ScoreLatest != resultManage[0].latest)
-    {
-        resultManage[0].delete();
-        ret = true;
-    }
-    
-    return ret;
+	var ret = false;
+	
+	if(resultManage.length == 0)
+	{
+		ret = true;
+	}
+	else
+	if(ScoreLatest != resultManage[0].dailyLatest)
+	{
+		resultManage[0].delete();
+		ret = true;
+	}
+	
+	return ret;
 }
 
 
 // 日毎管理テーブル作成 100ずつ //
 function makeDailyManageTbl_per100(totalNum, tblInfo)
 {
-    var Score = ncmb.DataStore(ThisScoreTbl);
+	var Score = ncmb.DataStore(ThisScoreTbl);
 
-    Score   .order("date")
-            .skip(tblInfo.ptrNum)
-            .fetchAll()
-            .then(function(results){
-                var i;
-                for(i=0; i<results.length; i++)
-                {
-                    tblInfo.scoreNum++;
-                    if(tblInfo.bkDate != results[i].date)
-                    {
-                        if(tblInfo.totalDate != 0){
-                            saveDailyDate( tblInfo.bkDate, tblInfo.scoreNum/4, false );
-                        }
-                        tblInfo.totalDate++;
-                        tblInfo.scoreNum=0;
-                        tblInfo.bkDate = results[i].date;
-                    }
-                }
-                // 終了確認 //
-                tblInfo.ptrNum += results.length;
-                if(tblInfo.ptrNum == totalNum)
-                {
-                    //完了!
-                    tblInfo.scoreNum++;
-                    saveDailyDate( tblInfo.bkDate, tblInfo.scoreNum/4, true );
-                    alert("tblInfo.totalDate = " + tblInfo.totalDate);
-                    finishDailyStore();
-                }
-                else
-                {
-                    makeDailyManageTbl_per100(totalNum, tblInfo);
-                }
-            })
-            .catch(function(err){
-                alert("err2:"+err);
-            })
-
-
-
+	Score
+		.order("date")
+		.skip(tblInfo.ptrNum)
+		.fetchAll()
+		.then(function(results){
+			var i;
+			for(i=0; i<results.length; i++)
+			{
+				tblInfo.scoreNum++;
+				if(tblInfo.bkDate != results[i].date)
+				{
+					if(tblInfo.totalDate != 0){
+						saveDailyDate( tblInfo.bkDate, tblInfo.scoreNum/4, false );
+					}
+					tblInfo.totalDate++;
+					tblInfo.scoreNum=0;
+					tblInfo.bkDate = results[i].date;
+				}
+			}
+			// 終了確認 //
+			tblInfo.ptrNum += results.length;
+			if(tblInfo.ptrNum == totalNum)
+			{
+				//完了!
+				tblInfo.scoreNum++;
+				saveDailyDate( tblInfo.bkDate, tblInfo.scoreNum/4, true );
+				alert("tblInfo.totalDate = " + tblInfo.totalDate);
+				finishDailyStore();
+			}
+			else
+			{
+				makeDailyManageTbl_per100(totalNum, tblInfo);
+			}
+		})
+		.catch(function(err){
+			alert("err2:"+err);
+		});
 }
 
 
@@ -288,189 +283,366 @@ function makeDailyManageTbl_per100(totalNum, tblInfo)
 /* 日毎管理テーブル 1データ保存 */
 function saveDailyDate( date, game, finalDt )
 {
-    var DailyStore = ncmb.DataStore("DailyManageTbl");
-    var dailyStore = new DailyStore();
-    
-    dailyStore  .set("date", date)
-                .set("gameNum", game)
-                .save()
-                .then(function(dailyStore){
-                    if(finalDt == true)
-                    {
-                        alert("complete!");
-                    }
-                })
-                .catch(function(err){
-                    alert("saveDailyDate error : " + err);
-                });
-    
+	var DailyStore = ncmb.DataStore("DailyManageTbl");
+	var dailyStore = new DailyStore();
+	
+	dailyStore	
+		.set("date", date)
+		.set("gameNum", game)
+		.save()
+		.then(function(dailyStore){
+			if(finalDt == true)
+			{
+				alert("complete!");
+			}
+		})
+		.catch(function(err){
+			alert("saveDailyDate error : " + err);
+		});
+	
 }
 
 
 /* 日毎管理テーブル作成後の処理 */
 function finishDailyStore()
 {
-    getDailyTblInfo();
+	getDailyTblInfo();
 }
 
 /* 日毎管理テーブル情報取得 */
 function getDailyTblInfo()
 {
-    var DailyStore = ncmb.DataStore("DailyManageTbl");
-    
-    DailyStore
-        .order("date")
-        .fetchAll()
-        .then(function(dailyRslt){
-            makeDailyMasterDisplay(dailyRslt);
-        })
-         .catch(function(err){
-            alert("getDailyTblInfo error : " + err);
-        });
+	var DailyStore = ncmb.DataStore("DailyManageTbl");
+	
+	DailyStore
+		.order("date")
+		.fetchAll()
+		.then(function(dailyRslt){
+			makeDailyMasterDisplay(dailyRslt);
+		})
+		 .catch(function(err){
+			alert("getDailyTblInfo error : " + err);
+		});
    
 }
 
 /* 詳細画面作成 */
 function makeDetailTbl(rslt)
 {
-alert(g_rslt.date);
-    var ptrNum = 0;
-    var Score = ncmb.DataStore( ThisScoreTbl );
-    Score
-        .equalTo("date",rslt.date)
-        .order("gameNo")
-        .count()
-        .fetchAll()
-        .then(function(detailRslt){
-            makeDetailTbl_per100(detailRslt, ptrNum, rslt.date);
-        })
-        .catch(function(err){
-            alert("makeDetailTbl error : " + err);
-        });
-    
+	var ptrNum = 0;
+	var Score = ncmb.DataStore( ThisScoreTbl );
+	Score
+		.equalTo("date",rslt.date)
+		.order("gameNo")
+		.count()
+		.fetchAll()
+		.then(function(detailRslt){
+			makeDetailTbl_per100(detailRslt, ptrNum, rslt.date);
+		})
+		.catch(function(err){
+			alert("makeDetailTbl error : " + err);
+		});
+	
 }
 
 /* 詳細画面作成 100ずつ */
 function makeDetailTbl_per100(detailRslt, ptrNum, date)
 {
-    var Score = ncmb.DataStore( ThisScoreTbl );
-    ptrNum += 100;
-    /* 全データ取得ならば */
-    if( detailRslt.count <= ptrNum )
+	var Score = ncmb.DataStore( ThisScoreTbl );
+	ptrNum += 100;
+	/* 全データ取得ならば */
+	if( detailRslt.count <= ptrNum )
+	{
+		makeDetailDisplay(detailRslt);
+	}
+	else
+	{
+	/* まだデータ必要ならば */
+		Score
+			.equalTo("date",date)
+			.order("gameNo")
+			.skip(ptrNum)
+			.fetchAll()
+			.then(function(detailRsltNext){
+				/* データをコピーして次の100データ取得 */
+				Array.prototype.push.apply(detailRslt, detailRsltNext);
+				makeDetailTbl_per100(detailRslt, ptrNum, date);
+			})
+			 .catch(function(err){
+				alert("makeDetailTbl_per100 error : " + err);
+			});
+	}
+}
+
+// 成績表作成 //
+var gbl_totalScoreNum=0;	//スコア総数
+function makeRankTbl()
+{
+	var Score = ncmb.DataStore( ThisScoreTbl );
+	var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
+	var totalTbl = new TotalTbl();
+	var scoreLatest;
+	var resultManage;
+	var totalNum;
+
+	Score
+		.order("updateDate", true)
+		.count()
+		.fetchAll()
+		.then(function(resultScore){
+			scoreLatest = resultScore[0].updateDate;	// 更新日時取得
+			gbl_totalScoreNum = resultScore.count;
+			TotalTbl
+				.fetchAll()
+				.then(function(resultManage){
+					// 更新ありならば
+					if( chkRankRefresh(scoreLatest, resultManage) )
+					{
+						totalTbl
+							.set("rankLatest", scoreLatest)
+							.set("dailyLatest", resultManage[0].dailyLatest)	// その他のデータは保持
+							.save()
+							.then(function(rslt){
+							})
+							.catch(function(err){
+								alert("makeRankTbl3 err:"+err);
+							})
+						remakeRankTbl();	// 成績表更新
+					}
+					else
+					{
+						finishMakeRankTbl();	  // 成績表作成完了! (更新なし)
+					}
+				})
+				.catch(function(err){
+					alert("makeRankTbl2 err:"+err);
+				});
+				
+		})
+		.catch(function(err){
+			alert("makeRankTbl1 err:"+err);
+		});
+
+}
+
+// 成績表更新
+function remakeRankTbl()
+{
+	var RankScore = ncmb.DataStore( "Rank" );
+   
+	// 成績表削除
+	RankScore
+		.fetchAll()
+		.then(function(results){
+			for(var i=0; i<results.length; i++)
+			{
+				results[i].delete();
+			}
+			
+			getMemberTbl(); // メンバーテーブル作成
+			
+		})
+		.catch(function(err){
+			alert("remakeRankTbl err:" + err);
+		});
+   
+   
+}
+
+// 会員のデータ取得
+var gbl_memberDB;	  // メンバーデータベース
+function getMemberTbl ()
+{
+	var MemberTbl = ncmb.DataStore("member");
+	var memInfo = new Object();
+	
+	MemberTbl
+		.order("ID")
+		.count()
+		.fetchAll()
+		.then(function(memRslt){
+			
+			memInfo.ptrNum = 0;
+			makeMemberTbl_per100(memRslt, memInfo);
+		})
+		.catch(function(err){
+			alert("getMemberTbl err" + err);
+		});
+}
+
+// 会員のデータ取得 100ずつ
+function makeMemberTbl_per100(memRslt, memInfo)
+{
+	var MemberTbl = ncmb.DataStore("member");
+
+	memInfo.ptrNum += 100;
+	
+	if( memInfo.ptrNum < memRslt.count )
+	{
+		MemberTbl
+			.order("ID")
+			.skip(memInfo.ptrNum)
+			.fetchAll()
+			.then(function(nextMemRslt){
+				Array.prototype.push.apply(memRslt, nextMemRslt);	// 結果合成
+				makeMemberTbl_per100(memRslt, memInfo);
+			})
+			.catch(function(err){
+				alert("makeMemberTbl_per100 err:" +err);
+			});
+	}
+	else
+	{	// データ取得完了!
+		gbl_memberDB = memRslt;
+		finishmakeMemberTbl();
+	}
+}
+
+// 会員のデータ取得完了時
+function finishmakeMemberTbl()
+{
+	var tblInfo = new Object()
+
+	tblInfo.ptrNum = 0;		//　解析中のデータ数(100ずつ)
+	tblInfo.bkID = "";
+	tblInfo.totalIDNum = 0; //	IDの総数(種類)
+	tblInfo.gameNum = 0;	//	試合数
+	tblInfo.pt = 0;			//	ポイント
+	tblInfo.winNum = 0;		//	勝利数
+	
+	makeRankTbl_per100(gbl_totalScoreNum, tblInfo);
+	
+}
+
+// メンバーデータ取得
+function getMemberData(tblInfo)
+{
+    for(var i=0; i<gbl_memberDB.count; i++)
     {
-        makeDetailDisplay(detailRslt);
+        if(tblInfo.bkID == +gbl_memberDB[i].ID)
+        {
+            tblInfo.dispName = gbl_memberDB[i].dispName;
+            tblInfo.HDCP = gbl_memberDB[i].HDCP;
+            return tblInfo;
+        }
     }
-    else
-    {
-    /* まだデータ必要ならば */
-        Score
-            .equalTo("date",date)
-            .order("gameNo")
-            .skip(ptrNum)
-            .fetchAll()
-            .then(function(detailRsltNext){
-                /* データをコピーして次の100データ取得 */
-                for(var i=0; i<detailRsltNext.length; i++)
-                {
-                    detailRslt[ptrNum+i] = detailRslt[i];
-                }
-                makeDetailTbl_per100(detailRslt, ptrNum, date);
-            })
-             .catch(function(err){
-                alert("makeDetailTbl_per100 error : " + err);
-            });
-    }
+    alert("該当IDなし ID:" + tblInfo.bkID);
+    return tblInfo;
 }
 
+// 成績表作成 100ずつ
+function makeRankTbl_per100(totalNum, tblInfo)
+{
+	var Score = ncmb.DataStore(ThisScoreTbl);
+	
+	Score
+		.order("ID")
+		.skip(tblInfo.ptrNum)
+		.fetchAll()
+		.then(function(results){
+			for(var i=0; i<results.length; i++)
+			{
+				tblInfo.scoreNum++;
+				tblInfo.gameNum++;					//	試合数
+				tblInfo.pt += results[i].gamePt;	 //	 ポイント
+				if(results[i].gamePt==5)
+				{
+					tblInfo.winNum++;				//	勝利数
+				}
 
-//mobile backendへの会員登録を行うメソッド
-function login (){
-    //テキストボックスからユーザー名とパスワードを取得
-    var userName = $("#user_name").val();
-    var password = $("#password").val();
+				if(tblInfo.bkID != results[i].ID)
+				{
+					if(tblInfo.totalIDNum != 0){	 //初回以外なら
+						saveRankData( tblInfo );
+					}
+					tblInfo.totalIDNum++;
+					tblInfo.gameNum = 0;
+					tblInfo.winNum = 0;
+					tblInfo.pt = 0;
+					tblInfo.bkID = results[i].ID;
+				}
+			}
+			// 終了確認 //
+			tblInfo.ptrNum += results.length;
+			if(tblInfo.ptrNum == totalNum)		// 最後のデータはまだ保存していないのでここで保存
+			{
+				//完了!
+				tblInfo.gameNum++;
+				saveRankData( tblInfo );
+				finishMakeRankTbl();
+			}
+			else
+			{
+				makeRankTbl_per100(totalNum, tblInfo);
+			}
+		})
+		.catch(function(err){
+			alert("err2:"+err);
+		})
 
-    //ユーザークラスのインスタンスを作成
-    var user = new ncmb.User();
 
-    //インスタンスにユーザー名とパスワードを設定
-    user.set("userName", userName)
-        .set("password", password);
-
-    //会員登録を行うsignUpByAccountメソッドを実行
-    user.signUpByAccount()
-        .then(function (object){
-            //成功する時の処理
-            ncmb.User.login(userName, password)
-                     .then(function(data){
-                        // ログイン後処理
-                        getCurrentUser();              
-                     })
-                     .catch(function(err){
-                        // エラー処理
-                        console.log("error:" + error.message);
-                     });
-        })
-        .catch(function (error){
-            //エラーが発生する時の処理
-            console.log("error:" + error.message);
-        });
 }
 
+// 成績表 データベースへ保存
+function saveRankData( tblInfo )
+{
+	var MemberTbl = ncmb.DataStore( "member" );
+	var RankScore = ncmb.DataStore( "Rank" );
+	var rankScore = new RankScore();	
 
-//ログイン中のユーザー名を取得して画面に表示する
-function getCurrentUser(){
-    //ログイン中の会員を取得
-    var user = ncmb.User.getCurrentUser();
+    tblInfo = getMemberData(tblInfo);
 
-    //取得した会員のユーザー名を表示する
-    $("#current_user").text("ログイン中のユーザー名："　+ user.get("userName"));
+	rankScore
+		.set("ID", +tblInfo.bkID)
+		.set("gameNum", tblInfo.gameNum)
+		.set("gamePt", tblInfo.pt)
+		.set("winNum", tblInfo.winNum)
+		.set("name", tblInfo.dispName)
+		.set("HDCP", tblInfo.HDCP)
+		.save()
+		.then(function(){
+		})
+		.catch(function(err){
+			alert("saveRankData rankScore err:" + err);
+		});
+
 }
 
-//$(function() {
-//  // 3候補リストに表示するデータを配列で準備
-//  var data = [
-//    "accepts",
-//    "action_name",
-//    "add",
-//    "add_column",
-//    "add_index",
-//    "add_timestamps",
-//    "after_create",
-//    "after_destroy",
-//    "after_filter",
-//    "all",
-//  ];
-//
-//  // 2オートコンプリート機能を適用
-//  $("#txtKeywd").autocomplete({
-//    source: data,
-//    autoFocus: true,
-//    delay: 500,
-//    minLength: 2
-//  });
-//});
-//
-//var dataList = [
-//    ['とうきょうとしんじゅくく', '東京都新宿区'],
-//    ['とうきょうとしながわく',   '東京都品川区'],
-//    ['とうきょうとすぎなみく',   '東京都杉並区']
-//];
-//
-//$(function() {
-//    /* input要素にオートコンプリートを適用 */
-//    $('input[name=address]').autocomplete({
-//        source : function(request, response) {
-//            var re   = new RegExp('^(' + request.term + ')'),
-//                list = [];
-// 
-//            $.each(dataList, function(i, values) {
-//                if(values[0].match(re) || values[1].match(re)) {
-//                    list.push(values[1]);
-//                }
-//            });
-//            response(list);
-//        }
-//    });
-//});
-//
+// 成績表テーブル作成完了
+function finishMakeRankTbl()
+{
+	var RankScore = ncmb.DataStore( "Rank" );
+
+	RankScore
+		.order("ID")
+		.fetchAll()
+		.then(function(rslt){
+			makeRankDisplay(rslt);
+		})
+		.catch(function(err){
+			alert("finishMakeRankTbl err:"+err);
+		});
+}
+
+// 成績表更新チェック
+// true:データなし　又は更新時間が異なる
+function chkRankRefresh(ScoreLatest, resultManage)
+{
+	var ret = false;
+	
+	if(resultManage.length == 0)
+	{
+		ret = true;
+	}
+	else
+	if(ScoreLatest != resultManage[0].rankLatest)
+	{
+		resultManage[0].delete();
+		ret = true;
+	}
+	
+	return ret;
+
+}
+
 
