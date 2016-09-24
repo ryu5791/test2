@@ -4,11 +4,14 @@
     
   <ons-page id="detailPage">
     <ons-toolbar id="detail-toolbar">
+         <div class="left">
+             <ons-toolbar-button ng-click="app.slidingMenu.toggleMenu()"><ons-icon icon="bars"></ons-icon></ons-toolbar-button>
+         </div>
       <div class="center"></div>
     </ons-toolbar>
 
       <ons-list id="detail-list">
-        <ons-list-item modifier="chevron" class="item" id="detail-content">
+        <ons-list-item class="item" id="detail-content">
             
         </ons-list-item>
       </ons-list>

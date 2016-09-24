@@ -27,23 +27,51 @@ function makeRankDisplay(rankRslt)
 {
         var onsList = document.getElementById('rank-list');
         var onsListItem = document.createElement("rank-list");
+        onsListItem.innerHTML = "<table  border='1' cellspacing='0'>"+
+                                "<tr>" +
+                                "<th width='30'>No</th>" +
+                                "<th width='60'>会員名</th>" +
+                                "<th width='30'>pt</th>" +
+                                "<th width='40'>game</th>" +
+                                "<th width='40'>grs</th>" +
+                                "<th width='30'>win</th>" +
+                                "<th width='40'>Net</th>" +
+                                "</tr>"+
+                                "</table>";
+        onsList.appendChild(onsListItem);
+        ons.compile(onsListItem);
+        
         for( var i = 0; i< rankRslt.length; i++ )
         {
+            var gross = (rankRslt[i].gamePt/rankRslt[i].gameNum).toFixed(2);
+            var a_net = ((+gross) + (+rankRslt[i].HDCP)).toFixed(2);
+            var no;
+            if(i<rankRslt.validNum)
+            {
+                no=i+1;
+            }
+            else
+            {
+                no="";
+            }
+//            alert();
             onsListItem = document.createElement("rank-list");
-            onsListItem.innerHTML = "<ons-row id = dailyRow"+i+">" +
-                                        "<ons-col>"+
-                                            "<header>"+rankRslt[i].ID
-                                                    +" gross："
-                                                    +((rankRslt[i].gamePt/rankRslt[i].gameNum).toFixed(3))
-                                                    +"勝率"
-                                                    +(rankRslt[i].winNum/rankRslt[i].gameNum).toFixed(3) +
-                                            "</header>"+
-                                        "</ons-col>"+
-                                    "</ons-row>";
+            onsListItem.innerHTML =  "<table  border='1' cellspacing='0'>"+
+                                "<tr>" +
+                                "<th width='30'>"+ no +"</th>" +
+                                "<th width='60'>"+ rankRslt[i].name +"</th>" +
+                                "<th width='30'>"+ rankRslt[i].gamePt +"</th>" +
+                                "<th width='40'>"+ rankRslt[i].gameNum +"</th>" +
+                                "<th width='40'>"+ gross +"</th>" +
+                                "<th width='30'>"+ rankRslt[i].winNum +"</th>" +
+                                "<th width='40'>"+ a_net +"</th>" +
+                                "</tr>" +
+                                "</table>";
             onsList.appendChild(onsListItem);
             ons.compile(onsListItem);
             
         }
+                                
 }
 
 
@@ -93,15 +121,21 @@ function makeDetailDisplay(detailRslt)
 //  alert("a" + detailRslt.count);
     var name = ["","","",""];
     var gamePt = [0,0,0,0];
+    var onsListItem;
     
-    var onsBar = document.getElementById('detail-toolbar');
-    var onsBarItem = document.createElement("detail-list");
-//    onsBarItem.innerHTML = "<div class='center'>" + detailRslt[0].date +"</div>";
-    onsBarItem.innerHTML = detailRslt[0].date;
-    onsBar.appendChild(onsBarItem);
-    ons.compile(onsBarItem);
 
     var onsList = document.getElementById('detail-list');
+    onsListItem = document.createElement("detail-list");
+    
+            onsListItem.innerHTML = "<ons-row>" +
+                                        "<ons-col>"+
+                                            "<header>"+detailRslt[0].date; +
+                                            "</header>" +
+                                        "</ons-col>"+
+                                    "</ons-row>";
+            onsList.appendChild(onsListItem);
+            ons.compile(onsListItem);
+    
     for( var i = 0; i< detailRslt.length; i++ )
     {
         if(detailRslt[i].row != null)
@@ -135,7 +169,7 @@ function makeDetailDisplay(detailRslt)
         /* 4データで１ゲーム分の記述 */
         if(i%4 == 3)
         {
-            var onsListItem = document.createElement("detail-list");
+            onsListItem = document.createElement("detail-list");
             onsListItem.innerHTML = "<ons-row>" +
                                         "<ons-col>"+
                                             "<header>"+"NO." + (i+1)/4 +
