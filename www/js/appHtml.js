@@ -1,3 +1,8 @@
+        // ゲーム数、人数 //
+        const GAME_WIN_POINT = 4;
+        const GAME_MAX = (GAME_WIN_POINT*2)-1;
+
+
 var showDialog = function(id){
 //    alert("OK");
     app.slidingMenu.setMainPage('page2.html', {closeMenu: true});
@@ -170,7 +175,7 @@ function makeDetailDisplay(detailRslt)
         if(i%4 == 3)
         {
             onsListItem = document.createElement("detail-list");
-            onsListItem.innerHTML = "<ons-row>" +
+            onsListItem.innerHTML = "<ons-row id=detailRow"+i+">" +
                                         "<ons-col>"+
                                             "<header>"+"NO." + (i+1)/4 +
                                             "</header>" +
@@ -192,4 +197,87 @@ function makeDetailDisplay(detailRslt)
             ons.compile(onsListItem);
         }
     }
+    
+    for(var i=0; i<detailRslt.length; i++)
+    {
+        (function (n) {
+            $("#detailRow" + i).click(function(){
+                goTogameDetailDisplay(detailRslt[n], ((n+1)/4));        // ゲーム内容表示
+                                                                        // (n+1)/4 : ゲームNo
+            });
+        })(i);
+        
+    }
 }
+
+// ゲーム内容表示
+function goTogameDetailDisplay(rslt, gameNo)
+{
+//     alert(rslt.date + ":" + gameNo);
+     get_gameDetail(rslt.date, gameNo);      // ゲーム内容取得
+}
+
+// ゲーム内容ウインド表示
+function dispGameDetailWindow(rslt)
+{
+//    alert(rslt[0].ID +":" + rslt[1].ID +":" + rslt[2].ID +":" +rslt[3].ID);
+    // rowがnullならサーブ順に表示
+    if(rslt[0].row == null)
+    {
+        var tempDt = rslt.concat();
+        rslt[(tempDt[0].serveTurn-1)] = $.extend(true, {}, tempDt[0]);
+        rslt[(tempDt[1].serveTurn-1)] = $.extend(true, {}, tempDt[1]);
+        rslt[(tempDt[2].serveTurn-1)] = $.extend(true, {}, tempDt[2]);
+        rslt[(tempDt[3].serveTurn-1)] = $.extend(true, {}, tempDt[3]);
+
+        // 2番目と3番目を入れ替える
+        var tempBf = $.extend(true, {}, rslt[1]);
+        rslt[1] = $.extend(true, {}, rslt[2]);
+        rslt[2] = $.extend(true, {}, tempBf);
+    }
+
+    alert(  rslt[0].date + "  No." + rslt[0].gameNo + "\n" +
+            get_NameFromID_space(rslt[0].ID, 6) + get_dispPersonScore(rslt[0], 0) +"\n" +
+            get_NameFromID_space(rslt[1].ID, 6) + get_dispPersonScore(rslt[1], 1) +"\n" +
+            "－－－" + "|" +"◎　◎　◎　◎|　5"+"\n" +
+            "－－－" + "|" +"　◎　◎　◎　|　3"+"\n" +
+            get_NameFromID_space(rslt[2].ID, 6) + get_dispPersonScore(rslt[2], 2) +"\n" +
+            get_NameFromID_space(rslt[3].ID, 6) + get_dispPersonScore(rslt[3], 3)
+            );
+}
+
+// スペース付きのIDから名前取得
+// strNum: 文字数(半角)
+function get_NameFromID_space(id, strNum)
+{
+    var enCnt = 0;
+    var str;
+    
+    id = +(id);
+    str = get_NameFromID(id);
+    
+    for (var i = 0;  i < str.length; i++) {
+        enCnt += str.charCodeAt(i) <= 255 ? 1 : 2;
+        if (enCnt > strNum) {
+            return str.substr(0, i);
+        }
+    }
+
+    if( enCnt != strNum ){
+        for(;enCnt<strNum; enCnt=enCnt+2)
+        {
+            str = str+"　";
+        }
+    }
+    
+    return str;
+}
+
+// 人のスコア表示
+function get_dispPersonScore(rslt, row)
+{
+    var str = "|";
+    
+    
+}
+

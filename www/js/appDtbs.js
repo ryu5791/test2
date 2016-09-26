@@ -1,12 +1,12 @@
 //mobile backendのAPIキーを設定
 //↓本番
-var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
+//var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
 //↓テスト
-//var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
+var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
 
 const ThisScoreTbl = "Score2016_2";
 
-var regMem;    		// regular member
+var regMem;        	// regular member
 
 window.onload = function(){
 		regMem = new Array();
@@ -455,7 +455,6 @@ function getMemberTbl ()
 {
 	var MemberTbl = ncmb.DataStore("member");
 	var memInfo = new Object();
-	
 	MemberTbl
 		.order("ID")
 		.count()
@@ -493,7 +492,11 @@ function makeMemberTbl_per100(memRslt, memInfo)
 	}
 	else
 	{	// データ取得完了!
-		gbl_memberDB = memRslt;
+alert("memRslt.count:"+memRslt.count);
+		gbl_memberDB = memRslt.concat();
+alert("gbl_memberDB[0].name:"+gbl_memberDB[0].name);
+        gbl_memberDB.count = memRslt.count;
+alert("gbl_memberDB.count:"+gbl_memberDB.count);
 		finishmakeMemberTbl();
 	}
 }
@@ -517,8 +520,11 @@ function finishmakeMemberTbl()
 // メンバーデータ取得
 function getMemberData(tblInfo)
 {
+alert("gbl_memberDB.count:"+gbl_memberDB.count);
     for(var i=0; i<gbl_memberDB.count; i++)
     {
+alert("tblInfo.dispName:"+tblInfo.dispName+":"+typeof(tblInfo.dispName)+"\n"+
+       "gbl_memberDB[i].ID:" + gbl_memberDB[i].ID + ":" + typeof(gbl_memberDB[i].ID) );        
         if(tblInfo.bkID == +gbl_memberDB[i].ID)
         {
             tblInfo.dispName = gbl_memberDB[i].dispName;
@@ -643,7 +649,7 @@ function sortRankData(rslt, thrGameNum)
     var btmPt=rslt.length-1;
     var validNum=0;
     // ソート
-alert(btmPt);
+
     // 有効・無効判定 / 有効は前半、無効は後半に移動する
     for(var topPt = 0; topPt<btmPt; topPt++)
     {
@@ -741,3 +747,22 @@ function chkRankRefresh(ScoreLatest, resultManage)
 }
 
 
+function get_gameDetail(date, gameNo)
+{
+    var Score = ncmb.DataStore( ThisScoreTbl );
+
+//    gameNo++;   // ??
+
+	Score	.equalTo("date", date)
+            .equalTo("gameNo", gameNo)
+            .order("row")
+            .fetchAll()
+//            .then(dispGameDetailWindow(rslt))
+            .then(function(rslt){
+                dispGameDetailWindow(rslt);
+            })
+            .catch(function(err){
+                alert("get_gameDetail err:" + err);
+            });
+    
+}
