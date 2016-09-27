@@ -1,7 +1,11 @@
-        // ゲーム数、人数 //
-        const GAME_WIN_POINT = 4;
-        const GAME_MAX = (GAME_WIN_POINT*2)-1;
+    // ゲーム数、人数 //
+    const GAME_WIN_POINT = 4;
+    const GAME_MAX = (GAME_WIN_POINT*2)-1;
 
+    // ゲーム数 //
+    const GAME_RESULT_EMPTY = 0;
+	const GAME_RESULT_UP = 1;
+	const GAME_RESULT_DN = 2;
 
 var showDialog = function(id){
 //    alert("OK");
@@ -239,8 +243,7 @@ function dispGameDetailWindow(rslt)
     alert(  rslt[0].date + "  No." + rslt[0].gameNo + "\n" +
             get_NameFromID_space(rslt[0].ID, 6) + get_dispPersonScore(rslt[0], 0) +"\n" +
             get_NameFromID_space(rslt[1].ID, 6) + get_dispPersonScore(rslt[1], 1) +"\n" +
-            "－－－" + "|" +"◎　◎　◎　◎|　5"+"\n" +
-            "－－－" + "|" +"　◎　◎　◎　|　3"+"\n" +
+            get_dispGameScore(rslt) +"\n" +
             get_NameFromID_space(rslt[2].ID, 6) + get_dispPersonScore(rslt[2], 2) +"\n" +
             get_NameFromID_space(rslt[3].ID, 6) + get_dispPersonScore(rslt[3], 3)
             );
@@ -278,6 +281,162 @@ function get_dispPersonScore(rslt, row)
 {
     var str = "|";
     
+    for(var i=0; i<GAME_MAX; i++)
+    {
+        //サーブ1巡目
+        if(i<4)
+        {
+            if(i==(rslt.serveTurn-1))
+            {
+                if(rslt.serve1st==1)
+                {
+                    str += "○";
+                }
+                else
+                {
+                    str += "Ｘ";
+                }
+            }
+            else
+            {
+                str += "　";
+            }
+        }
+        else
+        {//サーブ2巡目
+            if(i==(rslt.serveTurn-1+4))
+            {
+                if(rslt.serve2nd==1)
+                {
+                    str += "○";
+                }
+                else if(rslt.serve2nd==0)
+                {
+                    str += "Ｘ";
+                }
+                else
+                {
+                    str += "　";
+                }
+            }
+            else
+            {
+                str += "　";
+            }
+        }
+    }
     
+    str += "|";
+    return str;
 }
 
+// ゲームのスコア表示（上下段両方）
+function get_dispGameScore(rslt)
+{
+    var str = "－－－|";
+    var score = new Array(GAME_MAX);
+
+    // ゲーム経過結果取得
+    for(var i=0; i<GAME_MAX; i++)
+    {
+        score[i] = get_columnGame(rslt, i);
+    }
+
+    // 上段結果表示
+    for(var i=0; i<GAME_MAX; i++)
+    {
+        if(score[i]==GAME_RESULT_UP)
+        {
+            str += "◎";
+        }
+        else
+        {
+            str += "　";
+        }
+    }
+    
+    str += ("| " + rslt[0].gamePt + "\n" + "－－－|");
+    
+    // 下段結果
+    for(var i=0; i<GAME_MAX; i++)
+    {
+        if(score[i]==GAME_RESULT_DN)
+        {
+            str += "◎";
+        }
+        else
+        {
+            str += "　";
+        }
+    }
+    
+    str += ("| " + rslt[2].gamePt);
+    
+    return(str);
+}
+//            "－－－" + "|" +"◎　◎　◎　◎|　5"+"\n" +
+//            "－－－" + "|" +"　◎　◎　◎　|　3"+"\n" +
+
+// ゲーム経過結果、1列分取得
+function get_columnGame(rslt, col)
+{
+    var ret = GAME_RESULT_EMPTY;
+    
+    for(var i=0; i<4; i++)
+    {
+        if((col%4)==(rslt[i].serveTurn-1))     // サーブ順が一致
+        {
+            if(col<4)                       // サーブ一巡目
+            {
+                if(i<2)                     // 上段
+                {
+                    if(rslt[i].serve1st==1)
+                    {
+                        ret = GAME_RESULT_UP;
+                    }
+                    else if(rslt[i].serve1st==0)
+                    {
+                        ret = GAME_RESULT_DN;
+                    }
+                }
+                else                        // 下段
+                {
+                    if(rslt[i].serve1st==1)
+                    {
+                        ret = GAME_RESULT_DN;
+                    }
+                    else if(rslt[i].serve1st==0)
+                    {
+                        ret = GAME_RESULT_UP;
+                    }
+                }
+            }
+            else                            // サーブ２巡目
+            {
+                if(i<2)                     // 上段
+                {
+                    if(rslt[i].serve2nd==1)
+                    {
+                        ret = GAME_RESULT_UP;
+                    }
+                    else if(rslt[i].serve2nd==0)
+                    {
+                        ret = GAME_RESULT_DN;
+                    }
+                }
+                else                        // 下段
+                {
+                    if(rslt[i].serve2nd==1)
+                    {
+                        ret = GAME_RESULT_DN;
+                    }
+                    else if(rslt[i].serve2nd==0)
+                    {
+                        ret = GAME_RESULT_UP;
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
