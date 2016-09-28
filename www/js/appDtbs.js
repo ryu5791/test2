@@ -374,9 +374,27 @@ function makeDetailTbl_per100(detailRslt, ptrNum, date)
 	}
 }
 
+// 成績表管理関数
+var gbl_RankTbl;
+function manageRankTbl(CB_func)
+{
+    var rslt;
+    
+    if(gbl_RankTbl != null)
+    {
+        rslt = gbl_RankTbl;
+        CB_func(rslt);                  // コールバック関数実行
+    }
+    else
+    {
+        makeRankTbl(CB_func)
+    }
+}
+
+
 // 成績表作成 //
 var gbl_totalScoreNum=0;	//スコア総数
-function makeRankTbl()
+function makeRankTbl(CB_func)
 {
 	var Score = ncmb.DataStore( ThisScoreTbl );
 	var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
@@ -407,11 +425,11 @@ function makeRankTbl()
 							.catch(function(err){
 								alert("makeRankTbl3 err:"+err);
 							})
-						remakeRankTbl();	// 成績表更新
+						remakeRankTbl(CB_func);	// 成績表更新
 					}
 					else
 					{
-						finishMakeRankTbl();	  // 成績表作成完了! (更新なし)
+						finishMakeRankTbl(CB_func);	  // 成績表作成完了! (更新なし)
 					}
 				})
 				.catch(function(err){
@@ -492,11 +510,8 @@ function makeMemberTbl_per100(memRslt, memInfo)
 	}
 	else
 	{	// データ取得完了!
-alert("memRslt.count:"+memRslt.count);
 		gbl_memberDB = memRslt.concat();
-alert("gbl_memberDB[0].name:"+gbl_memberDB[0].name);
         gbl_memberDB.count = memRslt.count;
-alert("gbl_memberDB.count:"+gbl_memberDB.count);
 		finishmakeMemberTbl();
 	}
 }
@@ -575,7 +590,7 @@ function makeRankTbl_per100(totalNum, tblInfo)
 				//完了!
 				tblInfo.gameNum++;
 				saveRankData( tblInfo );
-				finishMakeRankTbl();
+				finishMakeRankTbl(CB_func);
 			}
 			else
 			{
@@ -584,7 +599,7 @@ function makeRankTbl_per100(totalNum, tblInfo)
 		})
 		.catch(function(err){
 			alert("err2:"+err);
-		})
+		});
 
 
 }
@@ -617,7 +632,7 @@ function saveRankData( tblInfo )
 }
 
 // 成績表テーブル作成完了
-function finishMakeRankTbl()
+function finishMakeRankTbl(CB_func)
 {
 	var RankScore = ncmb.DataStore( "Rank" );
     var thrGameNum;        // ゲーム数閾値
@@ -629,9 +644,11 @@ function finishMakeRankTbl()
             // ソート作業
             thrGameNum = getGameNumAvg(rslt);       // ゲーム数閾値取得
             rslt = sortRankData(rslt, thrGameNum);
+            gbl_RankTbl = rslt;
             
             // 表示！
-			makeRankDisplay(rslt);      
+//			makeRankDisplay(rslt);
+            CB_func(rslt);
 		})
 		.catch(function(err){
 			alert("finishMakeRankTbl err:"+err);

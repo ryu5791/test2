@@ -27,9 +27,16 @@ document.addEventListener("pageinit", function(e) {
   }
   else if(e.target.id == "period-page")
   {
-      makeRankTbl();
+//      makeRankTbl();
+        manageRankTbl(function(rslt){ CB_makeRankTbl_forDisp(rslt); });
   }
 }, false);
+
+// 成績画面表示用コールバック
+function CB_makeRankTbl_forDisp(rslt)
+{
+    makeRankDisplay(rslt);
+}
 
 // 成績表画面作成 //
 function makeRankDisplay(rankRslt)
@@ -261,7 +268,8 @@ function get_NameFromID_space(id, strNum)
     
     for (var i = 0;  i < str.length; i++) {
         enCnt += str.charCodeAt(i) <= 255 ? 1 : 2;
-        if (enCnt > strNum) {
+        if (enCnt > strNum) 
+        {
             return str.substr(0, i);
         }
     }
