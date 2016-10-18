@@ -1,8 +1,8 @@
 //mobile backendのAPIキーを設定
 //↓本番
-//var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
+var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
 //↓テスト
-var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
+//var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
 
 const ThisScoreTbl = "Score2016_2";
 
@@ -100,6 +100,7 @@ function get_NameFromID(idNum)
 		strName = "ID:" + idNum;		// ★暫定でID入力
 		Member
 			.equalTo("ID", +idNum)
+            .limit(1000)
 			.fetchAll()
 			.then(function(results){
 				var object = results[0];
@@ -120,9 +121,22 @@ function get_NameFromID(idNum)
 	return( strName );
 }
 
+// 日毎テーブル管理
+var gbl_DailyTbl;
+function manageDailyTbl(CB_func)
+{
+    if(gbl_DailyTbl != null)
+    {
+        CB_func(gbl_DailyTbl);          // 
+    }
+    else
+    {
+        makeDailyTbl(CB_func);
+    }
+}
 
 // 日毎テーブル作成
-function makeDailyTbl()
+function makeDailyTbl(CB_func)
 {
 	var Score = ncmb.DataStore( ThisScoreTbl );
 	
@@ -131,19 +145,15 @@ function makeDailyTbl()
 			.fetchAll()
 			.then(function(results){
 //				  alert("results.count : "+results.count);
-				makeDailyManageTbl(results.count);
+				makeDailyManageTbl(results.count, CB_func);
 			})
 			.catch(function(err){
 				alert("err1:"+err);
-			})
-	
+			});
 }
 
-
-
-
 // 日毎管理テーブル作成 //
-function makeDailyManageTbl(totalNum)
+function makeDailyManageTbl(totalNum, CB_func)
 {
 	var Score = ncmb.DataStore( ThisScoreTbl );
 	var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
@@ -188,7 +198,7 @@ function makeDailyManageTbl(totalNum)
 									tblInfo.totalDate = 0;
 									tblInfo.scoreNum = 0;
 									
-									makeDailyManageTbl_per100(totalNum, tblInfo);
+									makeDailyManageTbl_per100(totalNum, tblInfo, CB_func);
 								})
 								.catch(function(err){
 									alert("makeDailyManageTbl delete Err :" + err);
@@ -198,18 +208,17 @@ function makeDailyManageTbl(totalNum)
 						else
 						{
 							//完了!(更新なし)
-//							  alert("更新なし");
-							finishDailyStore();
+							finishDailyStore(CB_func);
 						}
 					})
 					.catch(function(err){
 						alert("makeDailyManageTbl2 Err :" + err);
-					})
+					});
 
 				})
 				.catch(function(err){
 					alert("makeDailyManageTbl Err :" + err);
-				})
+				});
 
 }
 
@@ -235,7 +244,7 @@ function ChkDailyRefresh(ScoreLatest, resultManage)
 
 
 // 日毎管理テーブル作成 100ずつ //
-function makeDailyManageTbl_per100(totalNum, tblInfo)
+function makeDailyManageTbl_per100(totalNum, tblInfo, CB_func)
 {
 	var Score = ncmb.DataStore(ThisScoreTbl);
 
@@ -266,18 +275,17 @@ function makeDailyManageTbl_per100(totalNum, tblInfo)
 				tblInfo.scoreNum++;
 				saveDailyDate( tblInfo.bkDate, tblInfo.scoreNum/4, true );
 //				alert("tblInfo.totalDate = " + tblInfo.totalDate);
-				finishDailyStore();
+				finishDailyStore(CB_func);
 			}
 			else
 			{
-				makeDailyManageTbl_per100(totalNum, tblInfo);
+				makeDailyManageTbl_per100(totalNum, tblInfo, CB_func);
 			}
 		})
 		.catch(function(err){
 			alert("err2:"+err);
 		});
 }
-
 
 
 /* 日毎管理テーブル 1データ保存 */
@@ -299,18 +307,17 @@ function saveDailyDate( date, game, finalDt )
 		.catch(function(err){
 			alert("saveDailyDate error : " + err);
 		});
-	
 }
 
 
 /* 日毎管理テーブル作成後の処理 */
-function finishDailyStore()
+function finishDailyStore(CB_func)
 {
-	getDailyTblInfo();
+	getDailyTblInfo(CB_func);
 }
 
 /* 日毎管理テーブル情報取得 */
-function getDailyTblInfo()
+function getDailyTblInfo(CB_func)
 {
 	var DailyStore = ncmb.DataStore("DailyManageTbl");
 	
@@ -318,12 +325,13 @@ function getDailyTblInfo()
 		.order("date")
 		.fetchAll()
 		.then(function(dailyRslt){
-			makeDailyMasterDisplay(dailyRslt);
+            gbl_DailyTbl = dailyRslt;
+//alert("OK" + CB_func);
+			CB_func(dailyRslt);
 		})
-		 .catch(function(err){
+		.catch(function(err){
 			alert("getDailyTblInfo error : " + err);
 		});
-   
 }
 
 /* 詳細画面作成 */
@@ -378,16 +386,13 @@ function makeDetailTbl_per100(detailRslt, ptrNum, date)
 var gbl_RankTbl;
 function manageRankTbl(CB_func)
 {
-    var rslt;
-    
     if(gbl_RankTbl != null)
     {
-        rslt = gbl_RankTbl;
-        CB_func(rslt);                  // コールバック関数実行
+        CB_func(gbl_RankTbl);                  // コールバック関数実行
     }
     else
     {
-        makeRankTbl(CB_func)
+        makeRankTbl(CB_func);
     }
 }
 
@@ -424,7 +429,7 @@ function makeRankTbl(CB_func)
 							})
 							.catch(function(err){
 								alert("makeRankTbl3 err:"+err);
-							})
+							});
 						remakeRankTbl(CB_func);	// 成績表更新
 					}
 					else
@@ -444,7 +449,7 @@ function makeRankTbl(CB_func)
 }
 
 // 成績表更新
-function remakeRankTbl()
+function remakeRankTbl(CB_func)
 {
 	var RankScore = ncmb.DataStore( "Rank" );
    
@@ -457,7 +462,7 @@ function remakeRankTbl()
 				results[i].delete();
 			}
 			
-			getMemberTbl(); // メンバーテーブル作成
+			getMemberTbl(CB_func); // メンバーテーブル作成
 			
 		})
 		.catch(function(err){
@@ -469,7 +474,7 @@ function remakeRankTbl()
 
 // 会員のデータ取得
 var gbl_memberDB;	  // メンバーデータベース
-function getMemberTbl ()
+function getMemberTbl (CB_func)
 {
 	var MemberTbl = ncmb.DataStore("member");
 	var memInfo = new Object();
@@ -480,7 +485,7 @@ function getMemberTbl ()
 		.then(function(memRslt){
 			
 			memInfo.ptrNum = 0;
-			makeMemberTbl_per100(memRslt, memInfo);
+			makeMemberTbl_per100(memRslt, memInfo, CB_func);
 		})
 		.catch(function(err){
 			alert("getMemberTbl err" + err);
@@ -488,7 +493,7 @@ function getMemberTbl ()
 }
 
 // 会員のデータ取得 100ずつ
-function makeMemberTbl_per100(memRslt, memInfo)
+function makeMemberTbl_per100(memRslt, memInfo, CB_func)
 {
 	var MemberTbl = ncmb.DataStore("member");
 
@@ -502,7 +507,7 @@ function makeMemberTbl_per100(memRslt, memInfo)
 			.fetchAll()
 			.then(function(nextMemRslt){
 				Array.prototype.push.apply(memRslt, nextMemRslt);	// 結果合成
-				makeMemberTbl_per100(memRslt, memInfo);
+				makeMemberTbl_per100(memRslt, memInfo, CB_func);
 			})
 			.catch(function(err){
 				alert("makeMemberTbl_per100 err:" +err);
@@ -512,14 +517,14 @@ function makeMemberTbl_per100(memRslt, memInfo)
 	{	// データ取得完了!
 		gbl_memberDB = memRslt.concat();
         gbl_memberDB.count = memRslt.count;
-		finishmakeMemberTbl();
+		finishmakeMemberTbl(CB_func);
 	}
 }
 
 // 会員のデータ取得完了時
-function finishmakeMemberTbl()
+function finishmakeMemberTbl(CB_func)
 {
-	var tblInfo = new Object()
+	var tblInfo = new Object();
 
 	tblInfo.ptrNum = 0;		//　解析中のデータ数(100ずつ)
 	tblInfo.bkID = "";
@@ -528,18 +533,15 @@ function finishmakeMemberTbl()
 	tblInfo.pt = 0;			//	ポイント
 	tblInfo.winNum = 0;		//	勝利数
 	
-	makeRankTbl_per100(gbl_totalScoreNum, tblInfo);
+	makeRankTbl_per100(gbl_totalScoreNum, tblInfo, CB_func);
 	
 }
 
 // メンバーデータ取得
 function getMemberData(tblInfo)
 {
-alert("gbl_memberDB.count:"+gbl_memberDB.count);
     for(var i=0; i<gbl_memberDB.count; i++)
     {
-alert("tblInfo.dispName:"+tblInfo.dispName+":"+typeof(tblInfo.dispName)+"\n"+
-       "gbl_memberDB[i].ID:" + gbl_memberDB[i].ID + ":" + typeof(gbl_memberDB[i].ID) );        
         if(tblInfo.bkID == +gbl_memberDB[i].ID)
         {
             tblInfo.dispName = gbl_memberDB[i].dispName;
@@ -552,7 +554,7 @@ alert("tblInfo.dispName:"+tblInfo.dispName+":"+typeof(tblInfo.dispName)+"\n"+
 }
 
 // 成績表作成 100ずつ
-function makeRankTbl_per100(totalNum, tblInfo)
+function makeRankTbl_per100(totalNum, tblInfo, CB_func)
 {
 	var Score = ncmb.DataStore(ThisScoreTbl);
 	
@@ -594,7 +596,7 @@ function makeRankTbl_per100(totalNum, tblInfo)
 			}
 			else
 			{
-				makeRankTbl_per100(totalNum, tblInfo);
+				makeRankTbl_per100(totalNum, tblInfo, CB_func);
 			}
 		})
 		.catch(function(err){

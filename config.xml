@@ -40,5 +40,5 @@
   <preference name="monaca:targetFamilyiPhone" value="1"/>
   <preference name="monaca:targetFamilyiPad" value="1"/>
   <preference name="WindowsStorePublisherName" value="My Name"/>
-  <preference name="WindowsStoreIdentityName" value="0bd2c60e-5da9-5124-f895-2563ffa2f7d5"/>
+  <preference name="WindowsStoreIdentityName" value="e660b9a6-8ef1-5502-ab7d-1ba552cdeda9"/>
 </widget>

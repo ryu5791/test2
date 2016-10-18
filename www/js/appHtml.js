@@ -2,7 +2,7 @@
     const GAME_WIN_POINT = 4;
     const GAME_MAX = (GAME_WIN_POINT*2)-1;
 
-    // ゲーム数 //
+    // ゲーム結果 //
     const GAME_RESULT_EMPTY = 0;
 	const GAME_RESULT_UP = 1;
 	const GAME_RESULT_DN = 2;
@@ -15,14 +15,14 @@ var showDialog = function(id){
 };
 
 document.addEventListener("pageinit", function(e) {
-  if (e.target.id == "my-page") {
-//    document.getElementById("my-content").innerHTML = "Item A<br>";
-        makeDailyTbl();
-        
-  }else if(e.target.id == "detailPage")
+  if (e.target.id == "my-page")
+  {
+//        makeDailyTbl();
+        manageDailyTbl(function(rslt){ CB_makeDailyTbl_forDisp(rslt) });
+  }
+  else if(e.target.id == "detailPage")
   {
         var page = dailyNavi.getCurrentPage();
-//alert(page.options.param1.date);
         makeDetailTbl(page.options.param1);
   }
   else if(e.target.id == "period-page")
@@ -31,6 +31,12 @@ document.addEventListener("pageinit", function(e) {
         manageRankTbl(function(rslt){ CB_makeRankTbl_forDisp(rslt); });
   }
 }, false);
+
+// 日毎画面表示用コールバック
+function CB_makeDailyTbl_forDisp(rslt)
+{
+    makeDailyMasterDisplay(rslt);
+}
 
 // 成績画面表示用コールバック
 function CB_makeRankTbl_forDisp(rslt)
@@ -89,7 +95,7 @@ function makeRankDisplay(rankRslt)
         }
                                 
 }
-
+ 
 
 /* 日毎マスター画面作成 */
 function makeDailyMasterDisplay(dailyRslt)
