@@ -7,12 +7,12 @@
 -------------------------------------*/
 var gbl_mngMemberTbl_MemberTbl;          // メンバーテーブル結果
 
-/**
+/***********************************************************
  * @brief   メンバーテーブル取得
  * @param   コールバック関数
  * @return  
  * @note    非同期関数（コールバックあり）
- */
+ **********************************************************/
 function getAsMemberTbl(CB_func)
 {
     if( gbl_mngMemberTbl_MemberTbl != null )
@@ -25,12 +25,12 @@ function getAsMemberTbl(CB_func)
     }
 }
 
-/**
+/***********************************************************
  * @brief   メンバーテーブルをデータベースから取得
  * @param   コールバック関数
  * @return  
  * @note    非同期関数（コールバックあり）
- */
+ **********************************************************/
 function getAsMemberTblFromDtbs(CB_func)
 {
     var Member = ncmb.DataStore("member");

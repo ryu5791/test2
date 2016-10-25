@@ -13,17 +13,16 @@ const RSLT_SCORE_BUF_MAX = 10;
 var gbl_mngScoreTbl_ScoreTbl = new Array();
 var gbl_mngScoreTbl_dtbsBuf = new Array(RSLT_SCORE_BUF_MAX);
 
-/**
+/***********************************************************
  * @brief   スコアテーブル取得
  * @param   コールバック関数
  * @return  
  * @note    非同期関数（コールバックあり）
- */
+ **********************************************************/
 function getAsScoreTbl(CB_func)
 {
     if( gbl_mngScoreTbl_ScoreTbl[0] != null )
     {
-        alert("OK");
         CB_func( gbl_mngScoreTbl_ScoreTbl );
     }
     else
@@ -32,12 +31,12 @@ function getAsScoreTbl(CB_func)
     }
 }
 
-/**
+/***********************************************************
  * @brief   スコアテーブル取得(データベースから)
  * @param   コールバック関数
  * @return  
  * @note    非同期関数（コールバックあり）
- */
+ **********************************************************/
 function getAsScoreTblFromDtbs( CB_func )
 {
     var rslt0 = new Promise(function(resolve, reject){
@@ -97,7 +96,8 @@ function getAsScoreTblFromDtbs( CB_func )
  * @param   
  * @return  
  * @note    非同期関数（コールバックあり）
- */
+ *          ID順にソート
+ **********************************************************/
 function getScoreDt(startPos, func, pt)
 {
     var Score = ncmb.DataStore( ThisScoreTbl );

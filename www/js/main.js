@@ -15,12 +15,12 @@ const GAME_RESULT_EMPTY = 0;
 const GAME_RESULT_UP = 1;
 const GAME_RESULT_DN = 2;
 
-/**
+/***********************************************************
  * @brief   
  * @param   
  * @return  
  * @note    
- */
+ **********************************************************/
 var showDialog = function(id){
 //    alert("OK");
     app.slidingMenu.setMainPage('page2.html', {closeMenu: true});
@@ -28,12 +28,12 @@ var showDialog = function(id){
 
 };
 
-/**
+/***********************************************************
  * @brief   ページ移動時の初動関数読み込み
  * @param
  * @return
  * @note
- */
+ **********************************************************/
 document.addEventListener("pageinit", function(e) 
 {
     if(e.target.id == "rank-page")
