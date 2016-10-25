@@ -29,24 +29,24 @@ var gbl_makeRank_thrGameNum;        // ゲーム数閾値
  **********************************************************/
 function startMakeRankDisplay()
 {
-    getAsMemberTbl(function(rslt){ chkAsRenewScoreTbl(rslt) });
+    getAsMemberTbl(function(rslt){ chkAsRenewScoreTbl_rank(rslt) });
 }
 
 /***********************************************************
- * @brief   スコア更新チェック
+ * @brief   ランクテーブルに対し、スコア更新チェック
  * @param   memRslt: メンバーテーブル結果
  * @return  
  * @note    
  **********************************************************/
-function chkAsRenewScoreTbl(memRslt)
+function chkAsRenewScoreTbl_rank(memRslt)
 {
     var Score = ncmb.DataStore( ThisScoreTbl );
-	var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
+    var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
 
     gbl_makeRank_memberTbl = $.extend(true, {}, memRslt);
 
     Score                       // データベース検索
-	.order("updateDate", true)
+    .order("updateDate", true)
 	.count()
 	.limit(1)
 	.fetchAll()
@@ -60,7 +60,7 @@ function chkAsRenewScoreTbl(memRslt)
             if( ( resultManage.count == 0 )
              || ( gbl_makeRank_bkScoreLatest != resultManage[0].rankLatest ) )
             {   // 更新ありならば
-                getAsScoreTbl(function(rslt){ deleteAsRankTbl(rslt) });     // next!
+                getAsScoreTbl_id(function(rslt){ deleteAsRankTbl(rslt) });     // next!
             }
             else
             {   // 更新なしならば
@@ -68,11 +68,11 @@ function chkAsRenewScoreTbl(memRslt)
             }
         })
     	.catch(function(err){
-			alert("chkAsRenewScoreTbl2 err:"+err);
+			alert("chkAsRenewScoreTbl_rank2 err:"+err);
 		});
 	})
 	.catch(function(err){
-		alert("chkAsRenewScoreTbl1 err:"+err);
+		alert("chkAsRenewScoreTbl_rank1 err:"+err);
 	});
 }
 
@@ -145,7 +145,7 @@ function addUpAsRankTbl( tblInfo, memberRslt, scoreRslt )
 
             if( tblInfo.ptrNum >= scoreRslt.count )
             {   // 集計終了時
-                remakeAsTotalManageTbl();                           // next!
+                remakeAsTotalManageTbl_rank();                           // next!
             }
             else
             {   // 集計継続
@@ -229,7 +229,7 @@ function getMemberData(id, memberRslt, tblInfo)
  * @return  
  * @note    メンバデータ作成後に実施
  **********************************************************/
-function remakeAsTotalManageTbl()
+function remakeAsTotalManageTbl_rank()
 {
     var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
 	var totalTbl = new TotalTbl();
@@ -249,7 +249,7 @@ function remakeAsTotalManageTbl()
         getAsRankTblFromDtbs();
     })
     .catch(function(err){
-    	alert("remakeAsTotalManageTbl err:"+err);
+    	alert("remakeAsTotalManageTbl_rank err:"+err);
 	});
 }
 
@@ -300,20 +300,25 @@ function getAsRankTblFromDtbs()
  * @brief   平均ゲーム数取得
  * @param   
  * @return  
- * @note    
+ * @note    会員のみの平均値
  **********************************************************/
 function getGameNumAvg( rslt )
 {
     var sum=0;
+    var num=0;
     var ret=0;
     
     for(var i=0; i<rslt.count; i++)
     {
-        sum += rslt[i].gameNum;
+        if(rslt[i].ID <= 100)
+        {
+            sum += rslt[i].gameNum;
+            num++;
+        }
     }
-    if(rslt.count!=0)
+    if(num!=0)
     {
-        ret = Math.floor(sum/(rslt.count));
+        ret = Math.floor(sum/num);
     }
     
     return( ret );
@@ -410,7 +415,6 @@ function makeRankDisplay(rankRslt)
 {
     var onsList = document.getElementById('rank-list');
     var onsListItem = document.createElement("rank-list");
-alert("OK!!");
     // 表の項目表示
     onsListItem.innerHTML = "<table  border='1' cellspacing='0'>"+
                             "<tr>" +
@@ -429,7 +433,7 @@ alert("OK!!");
     for( var i = 0; i< rankRslt.count; i++ )
     {
         var gross = (rankRslt[i].gamePt/rankRslt[i].gameNum).toFixed(2);
-        var a_net = ((+gross) + (+rankRslt[i].HDCP)).toFixed(2);
+        var a_net = ((rankRslt[i].gamePt/rankRslt[i].gameNum) + (+rankRslt[i].HDCP)).toFixed(2);
         var no;
         if(i<rankRslt.validNum)
         {
@@ -443,7 +447,7 @@ alert("OK!!");
         onsListItem.innerHTML = "<table  border='1' cellspacing='0'>"+
                                 "<tr>" +
                                 "<th width='30'>"+ no +"</th>" +
-                                "<th width='60'>"+ rankRslt[i].name +"</th>" +
+                                "<th width='60' id=nameCell" + i + ">"+ rankRslt[i].name +"</th>" +
                                 "<th width='30'>"+ rankRslt[i].gamePt +"</th>" +
                                 "<th width='40'>"+ rankRslt[i].gameNum +"</th>" +
                                 "<th width='40'>"+ gross +"</th>" +
@@ -454,6 +458,16 @@ alert("OK!!");
         onsList.appendChild(onsListItem);
         ons.compile(onsListItem);
     }
+    
+    for( var i = 0; i< rankRslt.count; i++ )
+    {
+        (function (n) {
+            $("#nameCell" + i).click(function(){
+                goToPersonalDisplay(rankRslt[n]);
+            });
+        })(i);
+    }
+
     // 閾値表示
     onsListItem = document.createElement("rank-list");
     onsListItem.innerHTML = "平均ゲーム数"+
@@ -464,8 +478,8 @@ alert("OK!!");
 
     // その他説明等表示
     onsListItem = document.createElement("rank-list");
-    onsListItem.innerHTML = "<header>"+ "pt :ポイント" + "</header>"+
-                            "<header>"+ "gm :試合数" + "</header>"+
+    onsListItem.innerHTML = "<header>"+ "pt:ポイント" + "</header>"+
+                            "<header>"+ "gm:試合数" + "</header>"+
                             "<header>"+ "grs:グロス" + "</header>"+
                             "<header>"+ "win:勝利数" + "</header>";
     onsList.appendChild(onsListItem);
