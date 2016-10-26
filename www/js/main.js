@@ -16,44 +16,49 @@ const GAME_RESULT_UP = 1;
 const GAME_RESULT_DN = 2;
 
 /***********************************************************
- * @brief   
- * @param   
- * @return  
- * @note    
+ * @brief    
+ * @param	
+ * @return	
+ * @note	
  **********************************************************/
 var showDialog = function(id){
-//    alert("OK");
-    app.slidingMenu.setMainPage('page2.html', {closeMenu: true});
+//	  alert("OK");
+	app.slidingMenu.setMainPage('page2.html', {closeMenu: true});
 
 
 };
 
 /***********************************************************
- * @brief   ページ移動時の初動関数読み込み
+ * @brief	ページ移動時の初動関数読み込み
  * @param
  * @return
  * @note
  **********************************************************/
 document.addEventListener("pageinit", function(e) 
 {
-    if(e.target.id == "rank-page")
-    {
-        startMakeRankDisplay();
-    }
+	if(e.target.id == "rank-page")
+	{
+		gmrk_startMakeRankDisplay();
+	}
+	else if(e.target.id == "person-page")
+	{
+		var page = rankNavi.getCurrentPage();
+		gmps_startPersonDisplay(page.options.param1);
+	}
 
-//  if (e.target.id == "my-page")
-//  {
-//        manageDailyTbl(function(rslt){ CB_makeDailyTbl_forDisp(rslt) });
-//  }
-//  else if(e.target.id == "detailPage")
-//  {
-//        var page = dailyNavi.getCurrentPage();
-//        makeDetailTbl(page.options.param1);
-//  }
-//  else if(e.target.id == "ranking-page")
-//  {
-////      makeRankTbl();
-//        manageRankTbl(function(rslt){ CB_makeRankTbl_forDisp(rslt); });
-//  }
+//	if (e.target.id == "my-page")
+//	{
+//		  manageDailyTbl(function(rslt){ CB_makeDailyTbl_forDisp(rslt) });
+//	}
+//	else if(e.target.id == "detailPage")
+//	{
+//		  var page = dailyNavi.getCurrentPage();
+//		  makeDetailTbl(page.options.param1);
+//	}
+//	else if(e.target.id == "ranking-page")
+//	{
+////	  makeRankTbl();
+//		  manageRankTbl(function(rslt){ CB_makeRankTbl_forDisp(rslt); });
+//	}
 }, false);
 
