@@ -8,7 +8,6 @@
 var gbl_makeRank_RankTbl;			// ランクテーブル結果
 var gbl_makeRank_totalMngTbl;
 var gbl_makeRank_bkScoreLatest;		// スコア更新日時
-var gbl_makeRank_bkDailyLatest;		// デイリーデータ更新日時
 var gbl_makeRank_memberTbl;			// メンバーテーブル結果
 var gbl_makeRank_scoreTbl;			// スコアテーブル結果
 var gbl_makeRank_thrGameNum;		// ゲーム数閾値
@@ -62,11 +61,11 @@ function lmrk_chkAsRenewScoreTbl_rank(memRslt)
 			}
 		})
 		.catch(function(err){
-			alert("chkAsRenewScoreTbl_rank2 err:"+err);
+			alert("lmrk_chkAsRenewScoreTbl_rank1 err:"+err);
 		});
 	})
 	.catch(function(err){
-		alert("chkAsRenewScoreTbl_rank1 err:"+err);
+		alert("lmrk_chkAsRenewScoreTbl_rank2 err:"+err);
 	});
 }
 

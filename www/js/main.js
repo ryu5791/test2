@@ -23,7 +23,7 @@ const GAME_RESULT_DN = 2;
  **********************************************************/
 var showDialog = function(id){
 //	  alert("OK");
-	app.slidingMenu.setMainPage('page2.html', {closeMenu: true});
+	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true});
 
 
 };
@@ -45,6 +45,10 @@ document.addEventListener("pageinit", function(e)
 		var page = rankNavi.getCurrentPage();
 		gmps_startPersonDisplay(page.options.param1);
 	}
+    else if(e.target.id == "daily-page")
+    {
+        gmdl_startMakeDailyDisplay();
+    }
 
 //	if (e.target.id == "my-page")
 //	{
