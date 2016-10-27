@@ -14,7 +14,7 @@ var gbl_makePerson_scoreRslt;
  ===========================================================
  * @brief    個人画面表示開始  前準備1
  * @param    
- * @return	
+ * @return    
  * @note	ID格納、メンバーテーブル取得
  ===========================================================
  **********************************************************/
@@ -188,8 +188,7 @@ function lmps_getDispName(memRslt)
  **********************************************************/
 function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
 {
-    var name = ["","","",""];
-    var gamePt = [0,0,0,0];
+    var dispRslt = new Array();
     var gameCount = 0;
     var onsList = document.getElementById('person-list');
     var onsListItem = document.createElement("person-list");
@@ -201,34 +200,33 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
                             "</ons-row>";
     onsList.appendChild(onsListItem);
     ons.compile(onsListItem);
-    
+
     for(var i=0; i<gameRslt.count; i++)
     {
+        if(i%4==0)
+        {
+            dispRslt[gameCount] = new Array();
+        }
         // 表示名、ゲーム数取得
         if(gameRslt[i].row != null)
         {
-            name[gameRslt[i].row] = gameRslt[i].name;
-            gamePt[gameRslt[i].row] = gameRslt[i].gamePt;
+            dispRslt[gameCount][gameRslt[i].row] = $.extend(true, {}, gameRslt[i]);
         }
         else
         {
             switch(gameRslt[i].serveTurn)
             {
                 case 1:
-                    name[0] = gameRslt[i].name;
-                    gamePt[0] = gameRslt[i].gamePt;
+                    dispRslt[gameCount][0] = $.extend(true, {}, gameRslt[i]);
                     break;
                 case 2:
-                    name[2] = gameRslt[i].name;
-                    gamePt[2] = gameRslt[i].gamePt;
+                    dispRslt[gameCount][2] = $.extend(true, {}, gameRslt[i]);
                     break;
                 case 3:
-                    name[1] = gameRslt[i].name;
-                    gamePt[1] = gameRslt[i].gamePt;
+                    dispRslt[gameCount][1] = $.extend(true, {}, gameRslt[i]);
                     break;
                 case 4:
-                    name[3] = gameRslt[i].name;
-                    gamePt[3] = gameRslt[i].gamePt;
+                    dispRslt[gameCount][3] = $.extend(true, {}, gameRslt[i]);
                     break;
             }
         }
@@ -236,36 +234,41 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
         if(i%4 == 3)
         {
             onsListItem = document.createElement("person-list");
-            onsListItem.innerHTML = "<ons-row id=detailRow"+i+">" +
+            onsListItem.innerHTML = "<ons-row id=detailRow"+((i+1)/4-1)+">" +
                                         "<ons-col>"+
-                                            "<header>"+"["+((i+1)/4)+"]"+
+                                            "<header>"+"["+((i+1)/4)+"] "+
                                                       dateGameNoRslt[gameCount].date+
                                                       " No:"+dateGameNoRslt[gameCount].gameNo+
                                             "</header>"+
                                             "<header>"+"上段ゲーム数 = "
-                                                    +gamePt[0]
+                                                    +dispRslt[gameCount][0].gamePt
                                                     + " |" 
-                                                    +name[0]+"さん,"
-                                                    +name[1]+"さん" +
+                                                    +dispRslt[gameCount][0].name+"さん,"
+                                                    +dispRslt[gameCount][1].name+"さん" +
                                             "</header>"+
                                             "<header>" +"下段ゲーム数 = "
-                                                    +gamePt[2]
+                                                    +dispRslt[gameCount][2].gamePt
                                                     + " |" 
-                                                    +name[2]+"さん,"
-                                                    +name[3]+"さん"+
+                                                    +dispRslt[gameCount][2].name+"さん,"
+                                                    +dispRslt[gameCount][3].name+"さん"+
                                             "</header>"+
                                         "</ons-col>"+
                                     "<ons-row>";
             onsList.appendChild(onsListItem);
             ons.compile(onsListItem);
-                                                      
-                                    
-            
             
             gameCount++;
         }
     }
-    
+
+    for(var i=0; i<dateGameNoRslt.count; i++)
+    {
+        (function (n) {
+            $("#detailRow" + i).click(function(){
+                gmgm_gameDetailDisplay("["+(n+1)+"] ", dispRslt[n]);
+            });
+        })(i);
+    }
 }
 
 
