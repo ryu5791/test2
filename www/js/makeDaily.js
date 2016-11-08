@@ -169,10 +169,13 @@ function lmdl_remakeAsTotalManageTbl_daily()
 	var totalTbl = new TotalTbl();
 	var bkRankLatest = null;
     
-    if(gbl_makeRank_totalMngTbl.count != 0)
+    if(gbl_makeDaily_totalMngTbl.count != 0)
 	{
-		bkRankLatest = gbl_makeRank_totalMngTbl[0].rankLatest;
-		gbl_makeRank_totalMngTbl[0].delete();
+		bkRankLatest = gbl_makeDaily_totalMngTbl[0].rankLatest;
+        for(var i=0; i<gbl_makeDaily_totalMngTbl.count; i++)
+        {
+    		gbl_makeDaily_totalMngTbl[i].delete();
+        }
 	}
     
     totalTbl
@@ -253,7 +256,26 @@ function lmdl_makeDailyDisplay(dailyRslt)
         onsList.appendChild(onsListItem);
         ons.compile(onsListItem);
     }
-    
+
+    for( var i = 0; i< dailyRslt.length; i++ )
+    {
+        (function (n) {
+            $("#dailyRow" + i).click(function(){
+                lmdl_goToDailyDetailDisplay(dailyRslt[n]);
+            });
+        })(i);
+    }
 }
 
+/***********************************************************
+ * @brief    デイリー詳細画面へ移行
+ * @param	
+ * @return	
+ * @note	
+ **********************************************************/
+function lmdl_goToDailyDetailDisplay(rslt)
+{
+    var options = {param1: rslt};
+    dailyNavi.pushPage("pageDailyDtl.html", options);
+}
 

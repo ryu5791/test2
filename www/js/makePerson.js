@@ -62,7 +62,7 @@ function lmps_makePersonTbl(keyId, memberRslt, scoreRslt)
     
     dateGameNoFromScoreTbl = $.extend(true, {}, lmps_getDateGameNo(keyId, scoreRslt));
     gameRsltFromScoreTbl = $.extend(true, {}, lmps_getGameRslt(scoreRslt, dateGameNoFromScoreTbl));
-    gameRsltFromScoreTbl = $.extend(true, {}, lmps_addName(gameRsltFromScoreTbl, memberRslt));
+    gameRsltFromScoreTbl = $.extend(true, {}, gmps_addName(gameRsltFromScoreTbl, memberRslt));
     
     for(var i=0; i<memberRslt.count; i++)
     {
@@ -141,8 +141,9 @@ function lmps_getGameRslt(scoreRslt, dateGameNoFromScoreTbl)
  * @param    
  * @return    
  * @note    
+ ===========================================================
  **********************************************************/
-function lmps_addName(gameRsltFromScoreTbl, memberRslt)
+function gmps_addName(gameRsltFromScoreTbl, memberRslt)
 {
     for(var i=0; i<gameRsltFromScoreTbl.count; i++)
     {
@@ -150,7 +151,7 @@ function lmps_addName(gameRsltFromScoreTbl, memberRslt)
         {
             if(gameRsltFromScoreTbl[i].ID == memberRslt[j].ID)
             {
-                gameRsltFromScoreTbl[i].name = lmps_getDispName(memberRslt[j])
+                gameRsltFromScoreTbl[i].name = lmps_getDispName(memberRslt[j]);
                 break;
             }
         }
@@ -236,21 +237,30 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
             onsListItem = document.createElement("person-list");
             onsListItem.innerHTML = "<ons-row id=detailRow"+((i+1)/4-1)+">" +
                                         "<ons-col>"+
-                                            "<header>"+"["+((i+1)/4)+"] "+
+                                            "<header>"+
+                                            "<div class='sample_01'>"+
+                                            "["+((i+1)/4)+"] "+
                                                       dateGameNoRslt[gameCount].date+
                                                       " No:"+dateGameNoRslt[gameCount].gameNo+
+                                            "</div>"+
                                             "</header>"+
-                                            "<header>"+"上段ゲーム数 = "
+                                            "<header>"+
+                                            "<div class='sample_01'>"+
+                                            "上段ゲーム数 = "
                                                     +dispRslt[gameCount][0].gamePt
                                                     + " |" 
                                                     +dispRslt[gameCount][0].name+"さん,"
                                                     +dispRslt[gameCount][1].name+"さん" +
+                                            "</div>"+
                                             "</header>"+
-                                            "<header>" +"下段ゲーム数 = "
+                                            "<header>"+
+                                            "<div class='sample_01'>"+
+                                            "下段ゲーム数 = "
                                                     +dispRslt[gameCount][2].gamePt
                                                     + " |" 
                                                     +dispRslt[gameCount][2].name+"さん,"
                                                     +dispRslt[gameCount][3].name+"さん"+
+                                            "</div>"+
                                             "</header>"+
                                         "</ons-col>"+
                                     "<ons-row>";

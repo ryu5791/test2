@@ -230,7 +230,10 @@ function lmrk_remakeAsTotalManageTbl_rank()
 	if(gbl_makeRank_totalMngTbl.count != 0)
 	{
 		bkDailyLatest = gbl_makeRank_totalMngTbl[0].dailyLatest;
-		gbl_makeRank_totalMngTbl[0].delete();
+        for(var i=0; i<gbl_makeRank_totalMngTbl.count; i++)
+        {
+    		gbl_makeRank_totalMngTbl[i].delete();
+        }
 	}
 
 	totalTbl

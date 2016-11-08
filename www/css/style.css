@@ -24,3 +24,7 @@
       color: #999;
       float: right;
     }
+    .sample_01{
+      writing-mode: horizontal-tb
+    }
+    

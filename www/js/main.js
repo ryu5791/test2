@@ -1,8 +1,8 @@
 //mobile backendのAPIキーを設定
 //↓本番
-//var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
+var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
 //↓テスト
-var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
+//var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
 
 const ThisScoreTbl = "Score2016_2";
 
@@ -21,9 +21,16 @@ const GAME_RESULT_DN = 2;
  * @return	
  * @note	
  **********************************************************/
-var showDialog = function(id){
+var showDialog = function(id)
+{
 //	  alert("OK");
-	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true});
+    if(id == "dialog-1"){
+    	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true});
+    }
+    else if(id == "toRank")
+    {
+        app.slidingMenu.setMainPage('pageRank.html', {closeMenu: true});
+    }
 
 
 };
@@ -49,6 +56,11 @@ document.addEventListener("pageinit", function(e)
     {
         gmdl_startMakeDailyDisplay();
     }
+    else if(e.target.id == "detail-Page")
+	{
+		var page = dailyNavi.getCurrentPage();
+		gmdd_startMakeDetailTbl(page.options.param1);
+	}
 
 //	if (e.target.id == "my-page")
 //	{
