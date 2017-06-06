@@ -81,7 +81,6 @@ document.addEventListener("pageinit", function(e)
     else if(e.target.id == "detail-page")
 	{
 		var page = Navi.getCurrentPage();
-alert(page.options.param1);
 		gmdd_startMakeDetailTbl(page.options.param1);
 	}
     else if(e.target.id == "past-page")
