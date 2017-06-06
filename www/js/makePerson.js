@@ -33,7 +33,7 @@ function gmps_startPersonDisplay(personRslt)
 function lmps_start2PersonDisplay(rslt)
 {
     gbl_makePerson_memberRslt = $.extend(true, {}, rslt);
-    gnst_getAsScoreTbl_date(function(rslt){ lmps_start3PersonDisplay(rslt) });
+    gnst_getAsScoreTbl_date(gmrk_get_current_scoreTbl(), function(rslt){ lmps_start3PersonDisplay(rslt) });
 }
 
 /***********************************************************
@@ -197,6 +197,10 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
                             "<ons-col>" +
                             "<header>"+dispName + "さん　試合数：" + dateGameNoRslt.count +
                             "</header>" +
+                            "<header>" +"----------------------------------------"+
+                            "</header>" +
+                            "<header  style='font-size: 14px'>"+"※下記クリックで試合詳細表示" +
+                            "</header>" +
                             "</ons-col>"+
                             "</ons-row>";
     onsList.appendChild(onsListItem);
@@ -241,7 +245,7 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
                                             "<div class='sample_01'>"+
                                             "["+((i+1)/4)+"] "+
                                                       dateGameNoRslt[gameCount].date+
-                                                      " No:"+dateGameNoRslt[gameCount].gameNo+
+                                                      " No:"+dateGameNoRslt[gameCount].gameNo+" -----------------------"+
                                             "</div>"+
                                             "</header>"+
                                             "<header>"+

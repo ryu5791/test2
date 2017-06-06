@@ -1,10 +1,13 @@
 //mobile backendのAPIキーを設定
 //↓本番
-var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
+//var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
 //↓テスト
-//var ncmb = new NCMB("15c1b1aa62fb0128a2b013dd7480250f71e00a80177d53e1cab99457a7dab5a4","85490ef92f820b634523453cc9353ea8068faec84ef3894c6cb1a193bfcdb7f1");
+var ncmb = new NCMB("9aa42fae63cd02970831cab4933f2819f4e83c9b3b21c810ec7d7403a21c1250","3e491d5ac914c76d1d2b1d6deef65f76f368c62f55df1e568a77675644040b36");
 
-const ThisScoreTbl = "Score2016_2";
+
+/** 定数宣言
+-------------------------------------*/
+const VER_NO = "ver 0.70.02";
 
 // ゲーム数、人数 //
 const GAME_WIN_POINT = 4;
@@ -23,17 +26,36 @@ const GAME_RESULT_DN = 2;
  **********************************************************/
 var showDialog = function(id)
 {
-//	  alert("OK");
-    if(id == "dialog-1"){
-    	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true});
+    if(id == "pageDaily"){
+    	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true, callback: func_test()});
+    }
+    else if(id == "backDaily")
+    {
+        app.slidingMenu.setMainPage('pageBackDaily.html', {closeMenu: true});
     }
     else if(id == "toRank")
     {
         app.slidingMenu.setMainPage('pageRank.html', {closeMenu: true});
     }
-
-
+    else if(id == "backRank")
+    {
+        app.slidingMenu.setMainPage('pageBackRank.html', {closeMenu: true});
+    }
+    else if(id == "pagePast")
+    {
+        app.slidingMenu.setMainPage('pagePast.html', {closeMenu: true});
+    }
+    else if(id == "pageEtc")
+    {
+        app.slidingMenu.setMainPage('pageEtc.html', {closeMenu: true});
+    }
 };
+
+
+function func_test()
+{
+    alert("OK")
+}
 
 /***********************************************************
  * @brief	ページ移動時の初動関数読み込み
@@ -45,22 +67,75 @@ document.addEventListener("pageinit", function(e)
 {
 	if(e.target.id == "rank-page")
 	{
-		gmrk_startMakeRankDisplay();
+		gmrk_startMakeRankDisplay(0);
 	}
 	else if(e.target.id == "person-page")
 	{
-		var page = rankNavi.getCurrentPage();
+		var page = Navi.getCurrentPage();
 		gmps_startPersonDisplay(page.options.param1);
 	}
     else if(e.target.id == "daily-page")
     {
-        gmdl_startMakeDailyDisplay();
+        gmdl_startMakeDailyDisplay(0);
     }
-    else if(e.target.id == "detail-Page")
+    else if(e.target.id == "detail-page")
 	{
-		var page = dailyNavi.getCurrentPage();
+		var page = Navi.getCurrentPage();
+alert(page.options.param1);
 		gmdd_startMakeDetailTbl(page.options.param1);
 	}
+    else if(e.target.id == "past-page")
+    {
+		gmpt_startPastDisplay();
+	}
+    else if(e.target.id == "pastRank-page")
+    {
+        var page = Navi.getCurrentPage();
+    	gmrk_startMakeRankDisplay(page.options.param1);
+	}
+    else if(e.target.id == "pastDaily-page")
+    {
+        var page = Navi.getCurrentPage();
+        gmdl_startMakeDailyDisplay(page.options.param1);
+	}
+    else if(e.target.id == "etcData-page")
+    {
+        var page = Navi.getCurrentPage();
+        gmetDt_startMakeEtcData(page.options.param1);
+    }
+    else if(e.target.id == "pastEtc-page")
+    {
+        var page = Navi.getCurrentPage();
+        gmet_startMakeEtc(page.options.param1);
+    }
+    else if(e.target.id == "backRank-page")
+    {
+        gmrk_startMakeRankDisplay_back();
+    }
+    else if(e.target.id == "backDaily-page")
+    {
+        gmdl_startMakeDailyDisplay_back();
+    }
+    else if(e.target.id == "etc-page")
+    {
+        gmet_startMakeEtc(0);
+    }
+    else if(e.target.id == "etcChm1-page")
+    {
+        gmetChm1_startChemistry();
+    }
+    else if(e.target.id == "etcChm2-page")
+    {
+        var page = Navi.getCurrentPage();
+        gmetChm2_startChemistry(page.options.param1);
+    }
+    else if(e.target.id == "etcChm3-page")
+    {
+        var page = Navi.getCurrentPage();
+        gmetChm3_startChemistry(page.options.param1, page.options.param2, page.options.param3);
+    }
+
+
 
 //	if (e.target.id == "my-page")
 //	{

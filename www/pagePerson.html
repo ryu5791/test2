@@ -1,5 +1,5 @@
 <html>
-<ons-navigator>
+<ons-navigator var="Navi">
  <ons-page id = "person-page">
      <ons-toolbar>
          <div class="left">
@@ -8,10 +8,12 @@
          <!-- ツールバーの文言を変更 -->
          <div class="center">個人結果</div>
      </ons-toolbar>
-      <ons-list id="person-list">
-        <ons-list-item  modifier="tappable" class="item"  id="person-content"  onclick="showDialog('toRank')">
+     <ons-bottom-toolbar>
+        <ons-list-item modifier="tappable" class="item"  id="person-content"  onclick="gmrk_back_to_ranking()">
             <div>&lt; BACK</div>
         </ons-list-item>
+     </ons-bottom-toolbar>
+      <ons-list inline id="person-list">
       </ons-list>
 
  </ons-page>

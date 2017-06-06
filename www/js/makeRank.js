@@ -1,27 +1,59 @@
 /**
  * @brief    ランク画面表示
- * @note	接頭語：mrk
+ * @note    接頭語：mrk
  */
+
+/** 定数宣言
+-------------------------------------*/
 
 /** グローバル変数宣言
 -------------------------------------*/
 var gbl_makeRank_RankTbl;			// ランクテーブル結果
-var gbl_makeRank_totalMngTbl;
 var gbl_makeRank_bkScoreLatest;		// スコア更新日時
 var gbl_makeRank_memberTbl;			// メンバーテーブル結果
 var gbl_makeRank_scoreTbl;			// スコアテーブル結果
 var gbl_makeRank_thrGameNum;		// ゲーム数閾値
 
+var gbl_makeRank_currentTotalTbl;        // 現在使用中の管理テーブル
+var gbl_makeRank_currentRankTblName;
+var gbl_makeRank_id_pos;
+
 /***********************************************************
  ===========================================================
- * @brief	ランク画面表示開始
+ * @brief	ランク画面表示開始 前準備1
  * @param	
  * @return	
  * @note	
  ===========================================================
  **********************************************************/
-function gmrk_startMakeRankDisplay()
+function gmrk_startMakeRankDisplay(id_pos)
 {
+    gbl_makeRank_id_pos = id_pos;
+    gntt_getAsTotalManageTbl(id_pos, function(rslt){lmrk_start2MakeRankDisplay(rslt)});
+}
+
+/***********************************************************
+ ===========================================================
+ * @brief    ランク画面表示開始 前準備1
+ * @param	
+ * @return	
+ * @note	過去成績からのBack押下時
+ ===========================================================
+ **********************************************************/
+function gmrk_startMakeRankDisplay_back()
+{
+    gntt_getAsTotalManageTbl(gbl_makeRank_id_pos, function(rslt){lmrk_start2MakeRankDisplay(rslt)});
+}
+
+/***********************************************************
+ * @brief    ランク画面表示開始 前準備2
+ * @param	
+ * @return	
+ * @note	
+ **********************************************************/
+function lmrk_start2MakeRankDisplay(currentTbl)
+{
+    gbl_makeRank_currentTotalTbl = $.extend(true, {}, currentTbl);
 	gnmt_getAsMemberTbl(function(rslt){ lmrk_chkAsRenewScoreTbl_rank(rslt) });
 }
 
@@ -33,8 +65,7 @@ function gmrk_startMakeRankDisplay()
  **********************************************************/
 function lmrk_chkAsRenewScoreTbl_rank(memRslt)
 {
-	var Score = ncmb.DataStore( ThisScoreTbl );
-	var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
+	var Score = ncmb.DataStore( gbl_makeRank_currentTotalTbl.scoreTbl );
 
 	gbl_makeRank_memberTbl = $.extend(true, {}, memRslt);
 
@@ -44,25 +75,20 @@ function lmrk_chkAsRenewScoreTbl_rank(memRslt)
 	.limit(1)
 	.fetchAll()
 	.then(function(resultScore){
-		gbl_makeRank_bkScoreLatest = resultScore[0].updateDate;
-		TotalTbl				// データベース検索
-		.count()
-		.fetchAll()
-		.then(function(resultManage){
-			gbl_makeRank_totalMngTbl = $.extend(true, {}, resultManage);	   // バックアップ
-			if( ( resultManage.count == 0 )
-			 || ( gbl_makeRank_bkScoreLatest != resultManage[0].rankLatest ) )
-			{	// 更新ありならば
-				gnst_getAsScoreTbl_id(function(rslt){ lmrk_deleteAsRankTbl(rslt) });		// next!
-			}
-			else
-			{	// 更新なしならば
-				lmrk_getAsRankTbl();												// next!
-			}
-		})
-		.catch(function(err){
-			alert("lmrk_chkAsRenewScoreTbl_rank1 err:"+err);
-		});
+    	gbl_makeRank_bkScoreLatest = resultScore[0].updateDate;
+        if( (gbl_makeRank_currentRankTblName == gbl_makeRank_currentTotalTbl.rankTbl)
+         && (gbl_makeRank_bkScoreLatest == gbl_makeRank_currentTotalTbl.rankLatest))
+        {   // テーブル取得済みで更新なしならば
+            lmrk_makeRankDisplay(gbl_makeRank_RankTbl);    			// next!	表示！
+        }
+        else if( gbl_makeRank_bkScoreLatest != gbl_makeRank_currentTotalTbl.rankLatest)
+    	{	// 更新ありならば
+			gnst_getAsScoreTbl_id(gbl_makeRank_currentTotalTbl.scoreTbl, function(rslt){ lmrk_deleteAsRankTbl(rslt) });		// next!
+		}
+		else
+		{	// 更新なしならば
+			lmrk_getAsRankTblFromDtbs();							// next!
+		}
 	})
 	.catch(function(err){
 		alert("lmrk_chkAsRenewScoreTbl_rank2 err:"+err);
@@ -77,7 +103,7 @@ function lmrk_chkAsRenewScoreTbl_rank(memRslt)
  **********************************************************/
 function lmrk_deleteAsRankTbl(scoreRslt)
 {
-	var RankScore = ncmb.DataStore( "Rank" );
+	var RankScore = ncmb.DataStore( gbl_makeRank_currentTotalTbl.rankTbl );
 
 	gbl_makeRank_scoreTbl = $.extend(true, {}, scoreRslt);
 	RankScore
@@ -137,7 +163,7 @@ function lmrk_addUpAsRankTbl( tblInfo, memberRslt, scoreRslt )
 
 			if( tblInfo.ptrNum >= scoreRslt.count )
 			{	// 集計終了時
-				lmrk_remakeAsTotalManageTbl_rank();							 // next!
+                lmrk_restoreAsTotalManageTbl_rank();
 			}
 			else
 			{	// 集計継続
@@ -171,7 +197,7 @@ function lmrk_clear_tblInfo( tblInfo )
  **********************************************************/
 function lmrk_saveRankData( tblInfo, memberRslt, scoreRslt )
 {
-	var RankScore = ncmb.DataStore( "Rank" );
+	var RankScore = ncmb.DataStore( gbl_makeRank_currentTotalTbl.rankTbl );
 	var rankScore = new RankScore();	
 
 	tblInfo = lmrk_getMemberData( scoreRslt[tblInfo.ptrNum-1].ID, memberRslt, tblInfo );
@@ -206,7 +232,16 @@ function lmrk_getMemberData(id, memberRslt, tblInfo)
 		if( id == memberRslt[i].ID )
 		{
 			tblInfo.dispName = memberRslt[i].dispName;
-			tblInfo.HDCP = memberRslt[i].HDCP;
+  		    tblInfo.HDCP = memberRslt[i].get(gbl_makeRank_currentTotalTbl.hdcpTbl);
+            if( memberRslt[i].get(gbl_makeRank_currentTotalTbl.hdcpTbl) == null )
+            {
+                tblInfo.HDCP = 0;
+            }
+            else
+            {
+                tblInfo.HDCP = +memberRslt[i].get(gbl_makeRank_currentTotalTbl.hdcpTbl);
+            }
+
 			return tblInfo;
 		 }
 	}
@@ -214,56 +249,27 @@ function lmrk_getMemberData(id, memberRslt, tblInfo)
 	return tblInfo;
 }
 
-
 /***********************************************************
- * @brief	トータル管理テーブル保存
+ * @brief	ランク保存日時更新
  * @param	
  * @return	
  * @note	メンバデータ作成後に実施
  **********************************************************/
-function lmrk_remakeAsTotalManageTbl_rank()
+function lmrk_restoreAsTotalManageTbl_rank()
 {
-	var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
+    var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
 	var totalTbl = new TotalTbl();
-	var bkDailyLatest = null;
 
-	if(gbl_makeRank_totalMngTbl.count != 0)
-	{
-		bkDailyLatest = gbl_makeRank_totalMngTbl[0].dailyLatest;
-        for(var i=0; i<gbl_makeRank_totalMngTbl.count; i++)
-        {
-    		gbl_makeRank_totalMngTbl[i].delete();
-        }
-	}
+    totalTbl.set("objectId", gbl_makeRank_currentTotalTbl.objectId);
+    totalTbl.set("rankLatest", gbl_makeRank_bkScoreLatest).update()
+    .then(function(rslt){
+        gbl_makeRank_currentTotalTbl.rankLatest = rslt.rankLatest;
+        lmrk_getAsRankTblFromDtbs();
+    })
+    .catch(function(err){
+        alert("lmrk_remakeAsTotalManageTbl_rank err:" + err);
+    });
 
-	totalTbl
-	.set("rankLatest", gbl_makeRank_bkScoreLatest)
-	.set("dailyLatest", bkDailyLatest)
-	.save()
-	.then(function(rslt){
-		lmrk_getAsRankTblFromDtbs();
-	})
-	.catch(function(err){
-		alert("lmrk_remakeAsTotalManageTbl_rank err:"+err);
-	});
-}
-
-/***********************************************************
- * @brief	ランクテーブル取得
- * @param	
- * @return	
- * @note	
- **********************************************************/
-function lmrk_getAsRankTbl()
-{
-	if(gbl_makeRank_RankTbl == null)
-	{
-		lmrk_getAsRankTblFromDtbs();
-	}
-	else
-	{
-		lmrk_makeRankDisplay(gbl_makeRank_RankTbl);				// next!	表示！
-	}
 }
 
 /***********************************************************
@@ -274,16 +280,17 @@ function lmrk_getAsRankTbl()
  **********************************************************/
 function lmrk_getAsRankTblFromDtbs()
 {
-	var RankScore = ncmb.DataStore( "Rank" );
-	
+	var RankScore = ncmb.DataStore( gbl_makeRank_currentTotalTbl.rankTbl );
+
 	RankScore
 	.order("ID")
 	.count()
 	.limit(1000)
 	.fetchAll()
 	.then(function(rslt){
-		gbl_makeRank_thrGameNum = lmrk_getGameNumAvg( rslt );						// 閾値取得
+		gbl_makeRank_thrGameNum = gmrk_getGameNumAvg( rslt );						// 閾値取得
 		gbl_makeRank_RankTbl = lmrk_sortRankData(rslt, gbl_makeRank_thrGameNum);		// データソート
+        gbl_makeRank_currentRankTblName = gbl_makeRank_currentTotalTbl.rankTbl;
 		lmrk_makeRankDisplay(gbl_makeRank_RankTbl);									// next!	表示！
 	})
 	.catch(function(err){
@@ -291,13 +298,15 @@ function lmrk_getAsRankTblFromDtbs()
 	});
 }
 
-/**
+/***********************************************************
+ ===========================================================
  * @brief	平均ゲーム数取得
- * @param	
- * @return	
+ * @param	rslt:	ランクテーブル
+ * @return	ret:	平均値
  * @note	会員のみの平均値
+ ===========================================================
  **********************************************************/
-function lmrk_getGameNumAvg( rslt )
+function gmrk_getGameNumAvg( rslt )
 {
 	var sum=0;
 	var num=0;
@@ -305,7 +314,7 @@ function lmrk_getGameNumAvg( rslt )
 	
 	for(var i=0; i<rslt.count; i++)
 	{
-		if(rslt[i].ID <= 100)
+        if(lmrk_chk_member(rslt[i].ID)==true)
 		{
 			sum += rslt[i].gameNum;
 			num++;
@@ -317,6 +326,32 @@ function lmrk_getGameNumAvg( rslt )
 	}
 	
 	return( ret );
+}
+
+/**
+ * @brief   会員判定
+ * @param	id:判定ID
+ * @return	true:会員
+ * @note	
+ **********************************************************/
+function lmrk_chk_member(id)
+{
+    var ret=true;
+    var memTbl=gbl_makeRank_memberTbl;
+    
+    for(var i=0; i<memTbl.count; i++)
+    {
+        if( memTbl[i].ID == id )
+        {
+            if ((memTbl[i].get(gbl_makeRank_currentTotalTbl.hdcpTbl) == null)
+             || (memTbl[i].get(gbl_makeRank_currentTotalTbl.hdcpTbl) == ""))
+            {
+                ret=false;
+            }
+        }
+    }
+    
+    return( ret );
 }
 
 /**
@@ -408,15 +443,48 @@ function lmrk_chkValidDat(gameNum, thrGameNum)
  **********************************************************/
 function lmrk_makeRankDisplay(rankRslt)
 {
-	var onsList = document.getElementById('rank-list');
-	var onsListItem = document.createElement("rank-list");
+    // タイトル表示
+    //----------------------------------
+    var onsList = document.getElementById('rank-toolbar');
+	var onsListItem = document.createElement("rank-toolbar");
+    
+    if( gbl_makeRank_id_pos == 0 )
+    {
+        onsListItem.innerHTML = "成績一覧";
+    }
+    else
+    {
+        onsListItem.innerHTML = gbl_makeRank_currentTotalTbl.disp;
+    }
+
+    onsList.appendChild(onsListItem);
+	ons.compile(onsListItem);
+
+    // bottom表示
+    //----------------------------------
+    var onsList = document.getElementById('rank-bottom-toolbar');
+    var onsListItem = document.createElement("rank-bottom-toolbar");
+    
+    if( gbl_makeRank_id_pos == 0 )
+    {
+    }
+    else
+    {
+        onsListItem.innerHTML = '<ons-list-item modifier="tappable" class="item"  id="person-content"  onclick="gmrk_back_to_ranking()">'
+                                +'</ons-list-item>';
+    }
+
+    // 表の表示
+    //----------------------------------
+    onsList = document.getElementById('rank-list');
+	onsListItem = document.createElement("rank-list");
 	// 表の項目表示
 	onsListItem.innerHTML = "<table	 border='1' cellspacing='0'>"+
 							"<tr>" +
 							"<th width='30'>No</th>" +
 							"<th width='60'>name</th>" +
-							"<th width='30'>pt</th>" +
-							"<th width='40'>gm</th>" +
+							"<th width='40'>pt</th>" +
+							"<th width='30'>gm</th>" +
 							"<th width='40'>grs</th>" +
 							"<th width='30'>win</th>" +
 							"<th width='40'>Net</th>" +
@@ -443,8 +511,8 @@ function lmrk_makeRankDisplay(rankRslt)
 								"<tr>" +
 								"<th width='30'>"+ no +"</th>" +
 								"<th width='60' id=nameCell" + i + ">"+ rankRslt[i].name +"</th>" +
-								"<th width='30'>"+ rankRslt[i].gamePt +"</th>" +
-								"<th width='40'>"+ rankRslt[i].gameNum +"</th>" +
+								"<th width='40'>"+ rankRslt[i].gamePt +"</th>" +
+								"<th width='30'>"+ rankRslt[i].gameNum +"</th>" +
 								"<th width='40'>"+ gross +"</th>" +
 								"<th width='30'>"+ rankRslt[i].winNum +"</th>" +
 								"<th width='40'>"+ a_net +"</th>" +
@@ -476,10 +544,10 @@ function lmrk_makeRankDisplay(rankRslt)
 	onsListItem.innerHTML = "<header>"+ "pt:ポイント" + "</header>"+
 							"<header>"+ "gm:試合数" + "</header>"+
 							"<header>"+ "grs:グロス" + "</header>"+
-							"<header>"+ "win:勝利数" + "</header>";
+							"<header>"+ "win:勝利数" + "</header>"+
+                            "<header Align='right'>"+ VER_NO + "</header>";
 	onsList.appendChild(onsListItem);
 	ons.compile(onsListItem);
-	
 	
 }
 
@@ -492,7 +560,52 @@ function lmrk_makeRankDisplay(rankRslt)
 function lmrk_goToPersonDisplay(rslt)
 {
 	var options = {param1: rslt};
-	rankNavi.pushPage("pagePerson.html", options);
+//	rankNavi.pushPage("pagePerson.html", options);
+    Navi.pushPage("pagePerson.html", options);
 }
 
+/***********************************************************
+ ===========================================================
+ * @brief   トータル管理用ID取得
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmrk_get_id_pos()
+{
+    return gbl_makeRank_id_pos;
+}
 
+/***********************************************************
+ ===========================================================
+ * @brief   現在のスコアテーブル取得
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmrk_get_current_scoreTbl()
+{
+    return gbl_makeRank_currentTotalTbl.scoreTbl;
+}
+
+/***********************************************************
+ ===========================================================
+ * @brief   個人画面からBack押下でランク画面へ移行時
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmrk_back_to_ranking()
+{
+    if(gbl_makeRank_id_pos == 0)
+    {
+        showDialog('toRank');
+    }
+    else
+    {
+        showDialog('backRank');
+    }
+}

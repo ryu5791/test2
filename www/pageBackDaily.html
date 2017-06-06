@@ -1,0 +1,23 @@
+<html>
+<!--
+<ons-navigator var="dailyNavi">
+-->
+<ons-navigator var="Navi">
+
+<ons-page id="backDaily-page">
+  <ons-toolbar>
+         <div class="left">
+             <ons-toolbar-button ng-click="app.slidingMenu.toggleMenu()"><ons-icon icon="bars"></ons-icon></ons-toolbar-button>
+         </div>
+    <div id="daily-toolbar" class="center"></div>
+  </ons-toolbar>
+  <ons-list id="daily-list">
+        <ons-list-item  modifier="tappable" class="item" id="backDaily-content" onclick="showDialog('pagePast')">
+            <div>&lt; BACK</div>
+        </ons-list-item>
+  </ons-list>
+</ons-page>
+
+</ons-navigator>
+
+</html>

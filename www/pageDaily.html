@@ -1,17 +1,18 @@
 <html>
-
+<!--
 <ons-navigator var="dailyNavi">
-    
+-->    
+<ons-navigator var="Navi">
 <ons-page id="daily-page">
   <ons-toolbar>
          <div class="left">
              <ons-toolbar-button ng-click="app.slidingMenu.toggleMenu()"><ons-icon icon="bars"></ons-icon></ons-toolbar-button>
          </div>
-    <div class="center">デイリー</div>
+    <div id="daily-toolbar" class="center"></div>
   </ons-toolbar>
   <ons-list id="daily-list">
     <ons-list-item class="item" id="daily-content">
-        <div>日付タップで詳細画面</div>
+        <div style="font-size: 14px">※日付タップで詳細画面</div>
     </ons-list-item>
   </ons-list>
 </ons-page>

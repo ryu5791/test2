@@ -1,11 +1,13 @@
 /**
- * @brief    メンバーテーブル管理
- * @note	接頭語：nmt
+ * @brief    メンバーテーブル、HDCPテーブル管理
+ * @note    接頭語：nmt
  */
 
 /** グローバル変数宣言
 -------------------------------------*/
-var gbl_mngMemberTbl_MemberTbl;			 // メンバーテーブル結果
+var gbl_mngMemberTbl_MemberTbl;    		 // メンバーテーブル結果
+var gbl_mngMemberTbl_MemberTbl_addHdcp;
+var gbl_mngMemberTbl_currentHdcpTblName;
 
 /***********************************************************
  ===========================================================

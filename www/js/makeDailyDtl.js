@@ -34,7 +34,7 @@ function gmdd_startMakeDetailTbl(dailyRslt)
 function lmdd_start2MakeDetailTbl(rslt)
 {
     gbl_makeDailyDtl_memberRslt = $.extend(true, {}, rslt);
-    gnst_getAsScoreTbl_date(function(rslt){ lmdd_start3MakeDetailTbl(rslt) });
+    gnst_getAsScoreTbl_date(gmdl_get_current_scoreTbl(), function(rslt){ lmdd_start3MakeDetailTbl(rslt) });
 }
 
 
@@ -105,6 +105,10 @@ function lmdd_DailyDtlDisplay(gameRslt, keyDate)
                             "<ons-col>" +
                             "<header>"+keyDate +"  試合数：" + (gameRslt.count/4) +
                             "</header>" +
+                            "<header>" +"----------------------------------------"+
+                            "</header>" +
+                            "<header  style='font-size: 14px'>"+"※下記クリックで試合詳細表示" +
+                            "</header>" +
                             "</ons-col>"+
                             "</ons-row>";
     onsList.appendChild(onsListItem);
@@ -148,7 +152,7 @@ function lmdd_DailyDtlDisplay(gameRslt, keyDate)
                                             "<div style='-webkit-writing-mode:horizontal-tb'>"+
                                             "<header>"+
                                                       dispRslt[gameCount][0].date+
-                                                      " No:"+dispRslt[gameCount][0].gameNo+
+                                                      " No:"+dispRslt[gameCount][0].gameNo+" --------------------------"+
                                             "</header>"+
                                             "<header>"+"上段ゲーム数 = "
                                                     +dispRslt[gameCount][0].gamePt

@@ -1,6 +1,6 @@
 /**
  * @brief    スコアテーブル管理
- * @note	接頭語：nst
+ * @note    接頭語：nst
  */
 
 /** 定数宣言
@@ -12,6 +12,8 @@ const NST_SORT_DATE = 1;
 
 /** グローバル変数宣言
 -------------------------------------*/
+var gbl_mngScoreTbl_currentScoreTbl_id;
+var gbl_mngScoreTbl_currentScoreTbl_date;       //!!
 var gbl_mngScoreTbl_ScoreTbl_id		= new Array();
 var gbl_mngScoreTbl_ScoreTbl_date	= new Array();
 var gbl_mngScoreTbl_dtbsBuf_id		= new Array(NST_RSLT_SCORE_BUF_MAX);
@@ -25,15 +27,15 @@ var gbl_mngScoreTbl_dtbsBuf_date	= new Array(NST_RSLT_SCORE_BUF_MAX);
  * @note	非同期関数（コールバックあり）
  ===========================================================
  **********************************************************/
-function gnst_getAsScoreTbl_id(CB_func)
+function gnst_getAsScoreTbl_id(nextTbl, CB_func)
 {
-	if( gbl_mngScoreTbl_ScoreTbl_id[0] != null )
+	if( gbl_mngScoreTbl_currentScoreTbl_id == nextTbl )
 	{
 		CB_func( gbl_mngScoreTbl_ScoreTbl_id );
 	}
 	else
 	{
-		lnst_getAsScoreTblFromDtbs( CB_func, NST_SORT_ID );
+		lnst_getAsScoreTblFromDtbs( CB_func, NST_SORT_ID, nextTbl );
 	}
 }
 
@@ -45,15 +47,15 @@ function gnst_getAsScoreTbl_id(CB_func)
  * @note	非同期関数（コールバックあり）
  ===========================================================
  **********************************************************/
-function gnst_getAsScoreTbl_date(CB_func)
+function gnst_getAsScoreTbl_date(nextTbl,CB_func)
 {
-	if( gbl_mngScoreTbl_ScoreTbl_date[0] != null )
+	if( gbl_mngScoreTbl_currentScoreTbl_date == nextTbl )
 	{
 		CB_func( gbl_mngScoreTbl_ScoreTbl_date );
 	}
 	else
 	{
-		lnst_getAsScoreTblFromDtbs( CB_func, NST_SORT_DATE );
+		lnst_getAsScoreTblFromDtbs( CB_func, NST_SORT_DATE, nextTbl );
 	}
 }
 
@@ -63,37 +65,37 @@ function gnst_getAsScoreTbl_date(CB_func)
  * @return	
  * @note	非同期関数（コールバックあり）
  **********************************************************/
-function lnst_getAsScoreTblFromDtbs( CB_func, sort )
+function lnst_getAsScoreTblFromDtbs( CB_func, sort, nextTbl )
 {
 	var rslt0 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(0, resolve, 0, sort);
+		lnst_getScoreDt(0, resolve, 0, sort, nextTbl);
 	});
 	var rslt1000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(1000, resolve, 1, sort);
+		lnst_getScoreDt(1000, resolve, 1, sort, nextTbl);
 	});
 	var rslt2000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(2000, resolve, 2, sort);
+		lnst_getScoreDt(2000, resolve, 2, sort, nextTbl);
 	});
 	var rslt3000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(3000, resolve, 3, sort);
+		lnst_getScoreDt(3000, resolve, 3, sort, nextTbl);
 	});
 	var rslt4000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(4000, resolve, 4, sort);
+		lnst_getScoreDt(4000, resolve, 4, sort, nextTbl);
 	});
 	var rslt5000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(5000, resolve, 5, sort);
+		lnst_getScoreDt(5000, resolve, 5, sort, nextTbl);
 	});
 	var rslt6000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(6000, resolve, 6, sort);
+		lnst_getScoreDt(6000, resolve, 6, sort, nextTbl);
 	});
 	var rslt7000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(7000, resolve, 7, sort);
+		lnst_getScoreDt(7000, resolve, 7, sort, nextTbl);
 	});
 	var rslt8000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(8000, resolve, 8, sort);
+		lnst_getScoreDt(8000, resolve, 8, sort, nextTbl);
 	});
 	var rslt9000 = new Promise(function(resolve, reject){
-		lnst_getScoreDt(9000, resolve, 9, sort);
+		lnst_getScoreDt(9000, resolve, 9, sort, nextTbl);
 	});
 	
 	Promise.all([rslt0, rslt1000, rslt2000, rslt3000, rslt4000, rslt5000, rslt6000, rslt7000, rslt8000, rslt9000]).then(function(value){
@@ -113,6 +115,7 @@ function lnst_getAsScoreTblFromDtbs( CB_func, sort )
 					gbl_mngScoreTbl_ScoreTbl_id[num] = $.extend( true, {}, gbl_mngScoreTbl_dtbsBuf_id[i][j] );
 				}
 			}
+            gbl_mngScoreTbl_currentScoreTbl_id = nextTbl;
 			CB_func(gbl_mngScoreTbl_ScoreTbl_id);
 		}
 		else // if(sort == NST_SORT_DATE)
@@ -131,6 +134,7 @@ function lnst_getAsScoreTblFromDtbs( CB_func, sort )
 					gbl_mngScoreTbl_ScoreTbl_date[num] = $.extend( true, {}, gbl_mngScoreTbl_dtbsBuf_date[i][j] );
 				}
 			}
+            gbl_mngScoreTbl_currentScoreTbl_date = nextTbl;
 			CB_func(gbl_mngScoreTbl_ScoreTbl_date);
 		}
 	}, function(value){
@@ -146,9 +150,9 @@ function lnst_getAsScoreTblFromDtbs( CB_func, sort )
  * @note	非同期関数（コールバックあり）
  *			ID順、または日付順にソート
  **********************************************************/
-function lnst_getScoreDt(startPos, func, pt, sort)
+function lnst_getScoreDt(startPos, func, pt, sort, nextTbl)
 {
-	var Score = ncmb.DataStore( ThisScoreTbl );
+	var Score = ncmb.DataStore( nextTbl );
 	
 	if(sort == NST_SORT_ID)
 	{
@@ -169,7 +173,7 @@ function lnst_getScoreDt(startPos, func, pt, sort)
 	else // if(sort == NST_SORT_DATE)
 	{
 		Score
-		.order("date").order("gameNo")
+		.order("date").order("gameNo").order("serveTurn")
 		.count()
 		.limit(1000)
 		.skip(startPos)

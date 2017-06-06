@@ -10,16 +10,46 @@ var gbl_makeDaily_totalMngTbl;
 var gbl_makeDaily_bkScoreLatest;
 var gbl_makeDaily_scoreTbl;
 
+var gbl_makeDaily_currentTotalTbl;        // 現在使用中の管理テーブル
+var gbl_makeDaily_currentDailyTblName;
+var gbl_makeDaily_id_pos;
+
 /***********************************************************
  ===========================================================
- * @brief   デイリー画面表示開始
+ * @brief   デイリー画面表示開始 前準備1
  * @param    
  * @return    
  * @note    
  ===========================================================
  **********************************************************/
-function gmdl_startMakeDailyDisplay()
+function gmdl_startMakeDailyDisplay(id_pos)
 {
+    gbl_makeDaily_id_pos = id_pos;
+    gntt_getAsTotalManageTbl(id_pos, function(rslt){gmdl_start2MakeDailyDisplay(rslt)});
+}
+
+/***********************************************************
+ ===========================================================
+ * @brief   デイリー画面表示開始 前準備1
+ * @param    
+ * @return    
+ * @note    過去成績からBack押下時
+ ===========================================================
+ **********************************************************/
+function gmdl_startMakeDailyDisplay_back()
+{
+    gntt_getAsTotalManageTbl(gbl_makeDaily_id_pos, function(rslt){gmdl_start2MakeDailyDisplay(rslt)});
+}
+
+/***********************************************************
+ * @brief   デイリー画面表示開始 前準備2
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function gmdl_start2MakeDailyDisplay(currentTbl)
+{
+    gbl_makeDaily_currentTotalTbl = $.extend(true, {}, currentTbl);
     lmdl_chkAsRenewScoreTbl_daily();
 }
 
@@ -31,9 +61,8 @@ function gmdl_startMakeDailyDisplay()
  **********************************************************/
 function lmdl_chkAsRenewScoreTbl_daily()
 {
-    var Score = ncmb.DataStore( ThisScoreTbl );
-    var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
-    
+    var Score = ncmb.DataStore( gbl_makeDaily_currentTotalTbl.scoreTbl );
+
     Score
     .order("updateDate", true)
     .count()
@@ -41,24 +70,19 @@ function lmdl_chkAsRenewScoreTbl_daily()
 	.fetchAll()
 	.then(function(resultScore){
         gbl_makeDaily_bkScoreLatest = resultScore[0].updateDate;
-    	TotalTbl
-		.count()
-		.fetchAll()
-		.then(function(resultManage){
-            gbl_makeDaily_totalMngTbl = $.extend(true, {}, resultManage);
-            if( ( resultManage.count == 0 )
-             || ( gbl_makeDaily_bkScoreLatest != resultManage[0].dailyLatest ) )
-            {   // 更新ありならば
-                gnst_getAsScoreTbl_date(function(rslt){ lmdl_deleteAsDailyTbl(rslt) });    	// next!
-            }
-            else
-            {   // 更新なしならば
-                lmdl_getAsDailyTbl();
-            }
-		})
-        .catch(function(err){
-            alert("lmdl_chkAsRenewScoreTbl_daily2 err:"+err);
-        });
+        if( (gbl_makeDaily_currentDailyTblName == gbl_makeDaily_currentTotalTbl.dailyTbl)
+         && (gbl_makeDaily_bkScoreLatest == gbl_makeDaily_currentTotalTbl.dailyLatest))
+        {   // テーブル取得済みで更新なしならば
+            lmdl_makeDailyDisplay(gbl_makeDaily_DailyTbl);        		// next!	表示！
+        }
+        else if( gbl_makeDaily_bkScoreLatest != gbl_makeDaily_currentTotalTbl.dailyLatest)
+    	{	// 更新ありならば
+            gnst_getAsScoreTbl_date(gbl_makeDaily_currentTotalTbl.scoreTbl, function(rslt){ lmdl_deleteAsDailyTbl(rslt) });
+		}
+		else
+		{	// 更新なしならば
+			lmdl_getAsDailyTblFromDtbs();							// next!
+		}
 	})
     .catch(function(err){
         alert("lmdl_chkAsRenewScoreTbl_daily1 err:"+err);
@@ -73,8 +97,8 @@ function lmdl_chkAsRenewScoreTbl_daily()
  **********************************************************/
 function lmdl_deleteAsDailyTbl(scoreRslt)
 {
-    var DailyScore = ncmb.DataStore( "Daily" );
-    
+    var DailyScore = ncmb.DataStore( gbl_makeDaily_currentTotalTbl.dailyTbl );
+
     gbl_makeDaily_scoreTbl = $.extend(true, {}, scoreRslt);
     DailyScore
     .fetchAll()
@@ -126,7 +150,7 @@ function lmdl_addUpAsDailyTbl( tblInfo, scoreRslt )
     		lmdl_saveDailyData( tblInfo, scoreRslt );
     		if( tblInfo.ptrNum >= scoreRslt.count )
 			{	// 集計終了時
-				lmdl_remakeAsTotalManageTbl_daily();							 // next!
+				lmdl_restoreAsTotalManageTbl_daily();							 // next!
 			}
 			else
 			{	// 集計継続
@@ -145,7 +169,7 @@ function lmdl_addUpAsDailyTbl( tblInfo, scoreRslt )
  **********************************************************/
 function lmdl_saveDailyData( tblInfo, scoreRslt )
 {
-    var DailyScore = ncmb.DataStore( "Daily" );
+    var DailyScore = ncmb.DataStore( gbl_makeDaily_currentTotalTbl.dailyTbl );
 	var dailyScore = new DailyScore();	
 
     dailyScore
@@ -158,13 +182,28 @@ function lmdl_saveDailyData( tblInfo, scoreRslt )
 }
 
 /***********************************************************
- * @brief    トータル管理テーブル保存
+ * @brief    デイリーテーブル保存日時更新
  * @param	
  * @return	
  * @note	メンバデータ作成後に実施
  **********************************************************/
-function lmdl_remakeAsTotalManageTbl_daily()
+function lmdl_restoreAsTotalManageTbl_daily()
 {
+    var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
+    var totalTbl = new TotalTbl();
+
+    totalTbl.set("objectId", gbl_makeDaily_currentTotalTbl.objectId);
+    totalTbl.set("dailyLatest", gbl_makeDaily_bkScoreLatest).update()
+    .then(function(rslt){
+        gbl_makeDaily_currentTotalTbl.dailyLatest = rslt.dailyLatest;
+        lmdl_getAsDailyTblFromDtbs();
+    })
+    .catch(function(err){
+        alert("lmrk_remakeAsTotalManageTbl_daily err:" + err);
+    });
+
+
+/*
     var TotalTbl = ncmb.DataStore( "TotalManageTbl" );
 	var totalTbl = new TotalTbl();
 	var bkRankLatest = null;
@@ -188,6 +227,7 @@ function lmdl_remakeAsTotalManageTbl_daily()
 	.catch(function(err){
 		alert("lmdl_remakeAsTotalManageTbl_daily err:"+err);
 	});
+*/
 }
 
 /***********************************************************
@@ -196,6 +236,7 @@ function lmdl_remakeAsTotalManageTbl_daily()
  * @return	
  * @note	
  **********************************************************/
+/*
 function lmdl_getAsDailyTbl()
 {
     if(gbl_makeDaily_DailyTbl == null)
@@ -207,6 +248,7 @@ function lmdl_getAsDailyTbl()
         lmdl_makeDailyDisplay(gbl_makeDaily_DailyTbl);    			// next!	表示！
     }
 }
+*/
 
 /***********************************************************
  * @brief   デイリーテーブル取得(データベースから)
@@ -216,7 +258,7 @@ function lmdl_getAsDailyTbl()
  **********************************************************/
 function lmdl_getAsDailyTblFromDtbs()
 {
-    var DailyScore = ncmb.DataStore( "Daily" );
+    var DailyScore = ncmb.DataStore( gbl_makeDaily_currentTotalTbl.dailyTbl );
     
     DailyScore
     .order("date")
@@ -225,6 +267,7 @@ function lmdl_getAsDailyTblFromDtbs()
     .fetchAll()
     .then(function(rslt){
         gbl_makeDaily_DailyTbl = rslt;
+        gbl_makeDaily_currentDailyTblName = gbl_makeDaily_currentTotalTbl.dailyTbl;
         lmdl_makeDailyDisplay(gbl_makeDaily_DailyTbl);       		// next!	表示！
     })
     .catch(function(err){
@@ -240,6 +283,26 @@ function lmdl_getAsDailyTblFromDtbs()
  **********************************************************/
 function lmdl_makeDailyDisplay(dailyRslt)
 {
+    // タイトル表示
+    //----------------------------------
+    var onsList = document.getElementById('daily-toolbar');
+    var onsListItem = document.createElement("daily-toolbar");
+    
+    if( gbl_makeDaily_id_pos == 0 )
+    {
+        onsListItem.innerHTML = "デイリー";
+    }
+    else
+    {
+        onsListItem.innerHTML = gbl_makeDaily_currentTotalTbl.disp;
+    }
+
+    onsList.appendChild(onsListItem);
+	ons.compile(onsListItem);
+
+    // 表の表示
+    //----------------------------------
+
     var onsList = document.getElementById('daily-list');
     for( var i = 0; i< dailyRslt.length; i++ )
     {
@@ -276,6 +339,51 @@ function lmdl_makeDailyDisplay(dailyRslt)
 function lmdl_goToDailyDetailDisplay(rslt)
 {
     var options = {param1: rslt};
-    dailyNavi.pushPage("pageDailyDtl.html", options);
+    Navi.pushPage("pageDailyDtl.html", options);
 }
 
+/***********************************************************
+ ===========================================================
+ * @brief   トータル管理用ID取得
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmdl_get_id_pos()
+{
+    return gbl_makeDaily_id_pos;
+}
+
+/***********************************************************
+ ===========================================================
+ * @brief   現在のスコアテーブル取得
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmdl_get_current_scoreTbl()
+{
+    return gbl_makeDaily_currentTotalTbl.scoreTbl;
+}
+
+/***********************************************************
+ ===========================================================
+ * @brief   個人画面からBack押下でランク画面へ移行時
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmdl_back_to_daily()
+{
+    if(gbl_makeDaily_id_pos == 0)
+    {
+        showDialog('pageDaily');
+    }
+    else
+    {
+        showDialog('backDaily');
+    }
+}

@@ -1,8 +1,9 @@
 <html>
-
+<!--
 <ons-navigator var="detailNavi">
-    
-  <ons-page id="detail-Page">
+-->    
+<ons-navigator var="Navi1">
+  <ons-page id="detail-page">
     <ons-toolbar id="detail-toolbar">
          <div class="left">
              <ons-toolbar-button ng-click="app.slidingMenu.toggleMenu()"><ons-icon icon="bars"></ons-icon></ons-toolbar-button>
@@ -11,7 +12,7 @@
     </ons-toolbar>
 
       <ons-list id="detail-list">
-        <ons-list-item  modifier="tappable" class="item" id="detail-content" onclick="showDialog('dialog-1')">
+        <ons-list-item  modifier="tappable" class="item" id="detail-content" onclick="gmdl_back_to_daily()">
             <div>&lt; BACK</div>
         </ons-list-item>
       </ons-list>
