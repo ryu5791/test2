@@ -379,7 +379,7 @@ function lmet_makeChemistryDisplay(pairInfo, name)
 function lmet_goToEtcChm3(rslt, name, pairName)
 {
 	var options = {param1: rslt, param2: name, param3: pairName};
-	Navi.pushPage("pageEtcChm3.html", options);
+	Navi3.pushPage("pageEtcChm3.html", options);
 }
 
 
@@ -415,5 +415,16 @@ function lmet_setgameInfo(date, gameNo)
     this.gameNo =gameNo;
 }
 
-
+/***********************************************************
+ ===========================================================
+ * @brief   
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmetChm2_back_to_Chm2()
+{
+    Navi3.popPage();
+}
 

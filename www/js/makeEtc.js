@@ -98,12 +98,32 @@ function lmet_makeEtc(scoreTbl_date)
     onsEtc.appendChild(onsEtcItem);
 	ons.compile(onsEtcItem);
 
+    // bottom表示
+    //----------------------------------
+    var onsList = document.getElementById('etc-bottom-toolbar');
+    var onsListItem = document.createElement("etc-bottom-toolbar");
+    
+    if( gbl_makeEtc_id_pos == 0 )
+    {
+        // 表示なし
+    }
+    else
+    {
+        onsListItem.innerHTML = '<ons-list-item modifier="tappable" class="item"  id="etc-content"  onclick="lmet_back_to_past()">'
+                              + '<div>&lt; BACK</div>'
+                              + '</ons-list-item>';
+    }
+
+    onsList.appendChild(onsListItem);
+    ons.compile(onsListItem);
+
     // ボタン表示
     //----------------------------------
     var onsEtc = document.getElementById('etc-list');
     var onsEtcItem = document.createElement("etc-list");
 
-    onsEtcItem.innerHTML = "<span style = 'line-height:200%'>" +
+    onsEtcItem.innerHTML =  "<br>" +
+                            "<span style = 'line-height:200%'>" +
                             "<input type='button' id='bigUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='大逆転'>" +
                             "<br>" +
                             "<input type='button' id='mdlUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='中逆転'>" +
@@ -137,14 +157,36 @@ function lmet_btn(btn)
         case 'mdlUpset':
         case 'failUpset':
             options = {param1: btn};
-            Navi.pushPage("pageEtcData.html", options);
+            Navi1.pushPage("pageEtcData.html", options);
             break;
         case 'chemistry':
-            Navi.pushPage("pageEtcChm1.html");
+            options = {param1: btn};
+            Navi1.pushPage("pageEtcChm1.html");
             break;
     }
-
-
 }
 
+/***********************************************************
+ * @brief   ボタン処理
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmet_back_to_past()
+{
+    preNavi.popPage();
+}
+
+/***********************************************************
+ ===========================================================
+ * @brief   Etc画面へ戻る
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmet_back_to_etc()
+{
+    Navi1.popPage();
+}
 

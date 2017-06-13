@@ -88,7 +88,7 @@ function lmpt_goToPastRankingDisplay(id)
     var options = {param1: id};
 
 //    pastNavi.pushPage("pagePastRank.html", options);
-    Navi.pushPage("pageRank.html", options);
+    preNavi.pushPage("pageRank.html", options);
 }
 
 /***********************************************************
@@ -101,7 +101,7 @@ function lmpt_goToPastDailyDisplay(id)
 {
     var options = {param1: id};
 
-    Navi.pushPage("pagePastDaily.html", options);
+    preNavi.pushPage("pageDaily.html", options);
 }
 
 /***********************************************************
@@ -114,5 +114,5 @@ function lmpt_goToPastEtcDisplay(id)
 {
     var options = {param1: id};
 
-    Navi.pushPage("pagePastEtc.html", options);
+    preNavi.pushPage("pageEtc.html", options);
 }

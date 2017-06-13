@@ -300,6 +300,25 @@ function lmdl_makeDailyDisplay(dailyRslt)
     onsList.appendChild(onsListItem);
 	ons.compile(onsListItem);
 
+    // bottom表示
+    //----------------------------------
+    var onsList = document.getElementById('daily-bottom-toolbar');
+    var onsListItem = document.createElement("daily-bottom-toolbar");
+    
+    if( gbl_makeDaily_id_pos == 0 )
+    {
+        onsListItem.innerHTML = '<div style="font-size: 14px"><br>※日付タップで詳細画面</div>';
+    }
+    else
+    {
+        onsListItem.innerHTML = '<ons-list-item modifier="tappable" class="item"  id="daily-content"  onclick="lmdl_back_to_Past()">'
+                              + '<div>&lt; BACK</div>'
+                              + '</ons-list-item>';
+    }
+
+    onsList.appendChild(onsListItem);
+    ons.compile(onsListItem);
+
     // 表の表示
     //----------------------------------
 
@@ -339,7 +358,19 @@ function lmdl_makeDailyDisplay(dailyRslt)
 function lmdl_goToDailyDetailDisplay(rslt)
 {
     var options = {param1: rslt};
-    Navi.pushPage("pageDailyDtl.html", options);
+    Navi1.pushPage("pageDailyDtl.html", options);
+}
+
+
+/***********************************************************
+ * @brief    Past画面へ移行
+ * @param    
+ * @return	
+ * @note	
+ **********************************************************/
+function lmdl_back_to_Past()
+{
+    preNavi.popPage();
 }
 
 /***********************************************************
@@ -378,12 +409,6 @@ function gmdl_get_current_scoreTbl()
  **********************************************************/
 function gmdl_back_to_daily()
 {
-    if(gbl_makeDaily_id_pos == 0)
-    {
-        showDialog('pageDaily');
-    }
-    else
-    {
-        showDialog('backDaily');
-    }
+    var options = {param1: gbl_makeDaily_id_pos};
+    Navi1.popPage(options);
 }

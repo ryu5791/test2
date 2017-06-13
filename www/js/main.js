@@ -26,10 +26,11 @@ const GAME_RESULT_DN = 2;
  **********************************************************/
 var showDialog = function(id)
 {
-    if(id == "pageDaily"){
-    	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true, callback: func_test()});
+/*    if(id == "pageDaily"){
+    	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true});
     }
-    else if(id == "backDaily")
+    else */
+    if(id == "backDaily")
     {
         app.slidingMenu.setMainPage('pageBackDaily.html', {closeMenu: true});
     }
@@ -43,19 +44,13 @@ var showDialog = function(id)
     }
     else if(id == "pagePast")
     {
-        app.slidingMenu.setMainPage('pagePast.html', {closeMenu: true});
+        
     }
     else if(id == "pageEtc")
     {
         app.slidingMenu.setMainPage('pageEtc.html', {closeMenu: true});
     }
 };
-
-
-function func_test()
-{
-    alert("OK")
-}
 
 /***********************************************************
  * @brief	ページ移動時の初動関数読み込み
@@ -65,22 +60,44 @@ function func_test()
  **********************************************************/
 document.addEventListener("pageinit", function(e) 
 {
+    if(e.target.id == "preRank-page")
+	{
+        var options = {param1: 0};
+        preNavi.pushPage("pageRank.html", options);
+	}
+    if(e.target.id == "preDaily-page")
+    {
+        var options = {param1: 0};
+        preNavi.pushPage("pageDaily.html", options);
+	}
+    if(e.target.id == "preEtc-page")
+    {
+        var options = {param1: 0};
+        preNavi.pushPage("pageEtc.html", options);
+    }
 	if(e.target.id == "rank-page")
 	{
-		gmrk_startMakeRankDisplay(0);
-	}
-	else if(e.target.id == "person-page")
-	{
-		var page = Navi.getCurrentPage();
-		gmps_startPersonDisplay(page.options.param1);
+        var page = preNavi.getCurrentPage();
+        gmrk_startMakeRankDisplay(page.options.param1);
 	}
     else if(e.target.id == "daily-page")
     {
-        gmdl_startMakeDailyDisplay(0);
+        var page = preNavi.getCurrentPage();
+        gmdl_startMakeDailyDisplay(page.options.param1);
     }
+    else if(e.target.id == "etc-page")
+    {
+        var page = preNavi.getCurrentPage();
+        gmet_startMakeEtc(page.options.param1);
+    }
+	else if(e.target.id == "person-page")
+	{
+		var page = Navi1.getCurrentPage();
+		gmps_startPersonDisplay(page.options.param1);
+	}
     else if(e.target.id == "detail-page")
 	{
-		var page = Navi.getCurrentPage();
+		var page = Navi1.getCurrentPage();
 		gmdd_startMakeDetailTbl(page.options.param1);
 	}
     else if(e.target.id == "past-page")
@@ -99,7 +116,7 @@ document.addEventListener("pageinit", function(e)
 	}
     else if(e.target.id == "etcData-page")
     {
-        var page = Navi.getCurrentPage();
+        var page = Navi1.getCurrentPage();
         gmetDt_startMakeEtcData(page.options.param1);
     }
     else if(e.target.id == "pastEtc-page")
@@ -115,22 +132,18 @@ document.addEventListener("pageinit", function(e)
     {
         gmdl_startMakeDailyDisplay_back();
     }
-    else if(e.target.id == "etc-page")
-    {
-        gmet_startMakeEtc(0);
-    }
     else if(e.target.id == "etcChm1-page")
     {
         gmetChm1_startChemistry();
     }
     else if(e.target.id == "etcChm2-page")
     {
-        var page = Navi.getCurrentPage();
+        var page = Navi2.getCurrentPage();
         gmetChm2_startChemistry(page.options.param1);
     }
     else if(e.target.id == "etcChm3-page")
     {
-        var page = Navi.getCurrentPage();
+        var page = Navi3.getCurrentPage();
         gmetChm3_startChemistry(page.options.param1, page.options.param2, page.options.param3);
     }
 

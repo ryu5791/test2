@@ -2,7 +2,7 @@
 <!--
 <ons-navigator var="etcChm2Navi">
 -->
-<ons-navigator var="Navi">
+<ons-navigator var="Navi3">
 
 <ons-page id = "etcChm2-page">
      <ons-toolbar>
@@ -12,9 +12,12 @@
          <!-- ツールバーの文言を変更 -->
          <div id = "etcChm2-toolbar" class="center"></div>
      </ons-toolbar>
-      <ons-list id="etcChm2-list">
-        <ons-list-item  id="etcChm2-content" >
+    <ons-bottom-toolbar id="etcChm2-bottom-toolbar">
+        <ons-list-item  modifier="tappable" class="item" id="detail-content" onclick="gmetChm1_back_to_Chm1()">
+            <div>&lt; BACK</div>
         </ons-list-item>
+    </ons-bottom-toolbar>
+      <ons-list id="etcChm2-list">
       </ons-list>
 
  </ons-page>

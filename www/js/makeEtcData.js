@@ -252,8 +252,31 @@ function lmetDt_DailyDtlDisplay(gameRslt, keyDate)
 {
     var dispRslt = new Array();
     var gameCount = 0;
-    var onsList = document.getElementById('etcData-list');
-    var onsListItem = document.createElement("etcData-list");
+//    var onsList = document.getElementById('etcData-list');
+//    var onsListItem = document.createElement("etcData-list");
+
+    // タイトル表示
+    //----------------------------------
+    var onsList = document.getElementById('etcData-toolbar');
+    var onsListItem = document.createElement("etcData-toolbar");
+    
+    if( gbl_makeEtc_id_pos == 0 )
+    {
+        onsListItem.innerHTML = "今期 エトセトラ";
+    }
+    else
+    {
+        onsListItem.innerHTML = gbl_makeEtc_currentTotalTbl.disp+" Etc.";
+    }
+
+    onsList.appendChild(onsListItem);
+    ons.compile(onsListItem);
+
+    // 各試合表示
+    //----------------------------------
+    onsList = document.getElementById('etcData-list');
+    onsListItem = document.createElement("etcData-list");
+
     onsListItem.innerHTML = "<ons-row>" +
                             "<ons-col>" +
                             "<header>"+keyDate +"  試合数：" + (gameRslt.length/4) +

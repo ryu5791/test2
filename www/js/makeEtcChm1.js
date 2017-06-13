@@ -15,6 +15,7 @@
 function gmetChm1_startChemistry()
 {
     var RankScore = ncmb.DataStore( gbl_makeEtc_currentTotalTbl.rankTbl );
+    var thrGameNum;
 
     RankScore
 	.order("ID")
@@ -23,6 +24,8 @@ function gmetChm1_startChemistry()
 	.fetchAll()
 	.then(function(rslt){
         gbl_makeEtc_rankTbl = $.extend( true, {}, rslt );
+    	thrGameNum = gmrk_getGameNumAvg( gbl_makeEtc_rankTbl );						// 閾値取得
+		gbl_makeEtc_rankTbl = gmrk_sortRankData(gbl_makeEtc_rankTbl, thrGameNum);	// データソート
         lmetChm1_chemistry_disp();
 	})
 	.catch(function(err){
@@ -49,11 +52,11 @@ function lmetChm1_chemistry_disp()
     
     if( gbl_makeEtc_id_pos == 0 )
     {
-        onsEtcItem.innerHTML = "今期 エトセトラ";
+        onsEtcItem.innerHTML = "今期 相性度";
     }
     else
     {
-        onsEtcItem.innerHTML = gbl_makeEtc_currentTotalTbl.disp+" Etc.";
+        onsEtcItem.innerHTML = gbl_makeEtc_currentTotalTbl.disp+" 相性度";
     }
 
     onsEtc.appendChild(onsEtcItem);
@@ -61,12 +64,17 @@ function lmetChm1_chemistry_disp()
 
     // ボタン表示
     //----------------------------------
-
+    onsEtc = document.getElementById('etcChm1-list');
+    onsEtcItem = document.createElement("etcChm1-list");
+    onsEtcItem.innerHTML =  "●対象者を選択してください<br>";
+                                
+    onsEtc.appendChild(onsEtcItem);
+    ons.compile(onsEtcItem);
     for(var i=0; i<rankTbl.count; i++)
     {
-        var onsEtc = document.getElementById('etcChm1-list');
-        var onsEtcItem = document.createElement("etcChm1-list");
-        onsEtcItem.innerHTML = "<span style = 'line-height:150%'>" +
+        onsEtc = document.getElementById('etcChm1-list');
+        onsEtcItem = document.createElement("etcChm1-list");
+        onsEtcItem.innerHTML =  "<span style = 'line-height:150%'>" +
                                 "<input type='button' id='etcChm1_name" + i + "'" +
                                 " onclick='lmetChm1_btn("+i+")' style='WIDTH: 40%; position: absolute; left:5%'" + 
                                 "value=" + rankTbl[i].name + ">" +
@@ -87,71 +95,11 @@ function lmetChm1_chemistry_disp()
 function lmetChm1_btn(index)
 {
     var options = {param1: index};
-    Navi.pushPage("pageEtcChm2.html", options);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
- * @brief   相性
- * @param    
- * @return    
- * @note    
- **********************************************************/
-function lmet_chemistry_chk2()
-{
-    var id = 73;
-    var start_pos=null;
-    var id_num=0;
-    var pairInfo = new Object();
-    var str="";
-    var gross;
-
-//alert("OK");
-
-    for(var i=0; i<gbl_makeEtc_ScoreTbl_id.count; i++)
-    {
-        if(gbl_makeEtc_ScoreTbl_id[i].ID == id)
-        {
-            if( start_pos == null )     // 初回のみ
-            {
-                start_pos = i;
-            }
-            id_num++;
-        }
-    }
-
-    pairInfo = lmet_getPairData(id, start_pos, id_num);
-
-    // 表示
-    gross = lmet_get_gross(id);
-    
-    alert("length:" + pairInfo.length);
-    
-    for(var i=0; i<pairInfo.length; i++ )
-    {
-        str += (pairInfo[i].name + ",");
-        str += (pairInfo[i].gameNum + ",");
-        str += (pairInfo[i].winNum + ",");
-        str += ((pairInfo[i].gamePt/pairInfo[i].gameNum - (gross + pairInfo[i].gross)/2).toFixed(3) + "\n");
-    }
-
-    alert(":" + str);
+    Navi2.pushPage("pageEtcChm2.html", options);
 }
 
 /***********************************************************
- * @brief   
+ * @brief   ペア情報配列取得
  * @param    
  * @return    
  * @note    
@@ -235,3 +183,15 @@ function lmet_setPairInfo(pairID, gross, name, gameNum, gamePt, winNum)
     
 }
 
+/***********************************************************
+ ===========================================================
+ * @brief   
+ * @param    
+ * @return    
+ * @note    
+ ===========================================================
+ **********************************************************/
+function gmetChm1_back_to_Chm1()
+{
+    Navi2.popPage();
+}

@@ -2,7 +2,7 @@
 <!--
 <ons-navigator var="detailNavi">
 -->    
-<ons-navigator var="Navi1">
+<ons-navigator var="Navi2">
   <ons-page id="detail-page">
     <ons-toolbar id="detail-toolbar">
          <div class="left">
@@ -10,11 +10,12 @@
          </div>
       <div class="center">デイリー詳細</div>
     </ons-toolbar>
-
-      <ons-list id="detail-list">
+     <ons-bottom-toolbar>
         <ons-list-item  modifier="tappable" class="item" id="detail-content" onclick="gmdl_back_to_daily()">
             <div>&lt; BACK</div>
         </ons-list-item>
+    </ons-bottom-toolbar>
+      <ons-list id="detail-list">
       </ons-list>
   </ons-page>
 </ons-navigator>

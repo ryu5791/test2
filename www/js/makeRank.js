@@ -289,7 +289,7 @@ function lmrk_getAsRankTblFromDtbs()
 	.fetchAll()
 	.then(function(rslt){
 		gbl_makeRank_thrGameNum = gmrk_getGameNumAvg( rslt );						// 閾値取得
-		gbl_makeRank_RankTbl = lmrk_sortRankData(rslt, gbl_makeRank_thrGameNum);		// データソート
+		gbl_makeRank_RankTbl = gmrk_sortRankData(rslt, gbl_makeRank_thrGameNum);		// データソート
         gbl_makeRank_currentRankTblName = gbl_makeRank_currentTotalTbl.rankTbl;
 		lmrk_makeRankDisplay(gbl_makeRank_RankTbl);									// next!	表示！
 	})
@@ -354,13 +354,15 @@ function lmrk_chk_member(id)
     return( ret );
 }
 
-/**
+/***********************************************************
+ ===========================================================
  * @brief	ランクソート
  * @param	
  * @return	
  * @note	閾値以上と未満で別々にソート
+ ===========================================================
  **********************************************************/
-function lmrk_sortRankData(rslt, thrGameNum)
+function gmrk_sortRankData(rslt, thrGameNum)
 {
 	var btmPt=rslt.count-1;
 	var validNum=0;
@@ -467,12 +469,19 @@ function lmrk_makeRankDisplay(rankRslt)
     
     if( gbl_makeRank_id_pos == 0 )
     {
+        onsListItem.innerHTML = '<div style="font-size: 14px">' +
+                                '<br>※表中の名前クリックで個人成績</div>';
+
     }
     else
     {
-        onsListItem.innerHTML = '<ons-list-item modifier="tappable" class="item"  id="person-content"  onclick="gmrk_back_to_ranking()">'
-                                +'</ons-list-item>';
+        onsListItem.innerHTML = '<ons-list-item modifier="tappable" class="item"  id="rank-content"  onclick="lmrk_back_to_Past()">'
+                              + '<div>&lt; BACK</div>'
+                              + '</ons-list-item>';
     }
+
+    onsList.appendChild(onsListItem);
+	ons.compile(onsListItem);
 
     // 表の表示
     //----------------------------------
@@ -561,7 +570,7 @@ function lmrk_goToPersonDisplay(rslt)
 {
 	var options = {param1: rslt};
 //	rankNavi.pushPage("pagePerson.html", options);
-    Navi.pushPage("pagePerson.html", options);
+    Navi1.pushPage("pagePerson.html", options);
 }
 
 /***********************************************************
@@ -591,6 +600,17 @@ function gmrk_get_current_scoreTbl()
 }
 
 /***********************************************************
+ * @brief   rank画面からBack押下でpast画面へ移行時
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmrk_back_to_Past()
+{
+    preNavi.popPage();
+}
+
+/***********************************************************
  ===========================================================
  * @brief   個人画面からBack押下でランク画面へ移行時
  * @param    
@@ -600,12 +620,6 @@ function gmrk_get_current_scoreTbl()
  **********************************************************/
 function gmrk_back_to_ranking()
 {
-    if(gbl_makeRank_id_pos == 0)
-    {
-        showDialog('toRank');
-    }
-    else
-    {
-        showDialog('backRank');
-    }
+    var options = {param1: gbl_makeRank_id_pos};
+    Navi1.popPage(options);
 }
