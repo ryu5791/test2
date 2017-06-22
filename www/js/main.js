@@ -18,39 +18,8 @@ const GAME_RESULT_EMPTY = 0;
 const GAME_RESULT_UP = 1;
 const GAME_RESULT_DN = 2;
 
-/***********************************************************
- * @brief    
- * @param	
- * @return	
- * @note	
- **********************************************************/
-var showDialog = function(id)
-{
-/*    if(id == "pageDaily"){
-    	app.slidingMenu.setMainPage('pageDaily.html', {closeMenu: true});
-    }
-    else */
-    if(id == "backDaily")
-    {
-        app.slidingMenu.setMainPage('pageBackDaily.html', {closeMenu: true});
-    }
-    else if(id == "toRank")
-    {
-        app.slidingMenu.setMainPage('pageRank.html', {closeMenu: true});
-    }
-    else if(id == "backRank")
-    {
-        app.slidingMenu.setMainPage('pageBackRank.html', {closeMenu: true});
-    }
-    else if(id == "pagePast")
-    {
-        
-    }
-    else if(id == "pageEtc")
-    {
-        app.slidingMenu.setMainPage('pageEtc.html', {closeMenu: true});
-    }
-};
+// 戻り値：データなし //
+const DATA_NON = -1;
 
 /***********************************************************
  * @brief	ページ移動時の初動関数読み込み
@@ -104,33 +73,10 @@ document.addEventListener("pageinit", function(e)
     {
 		gmpt_startPastDisplay();
 	}
-    else if(e.target.id == "pastRank-page")
-    {
-        var page = Navi.getCurrentPage();
-    	gmrk_startMakeRankDisplay(page.options.param1);
-	}
-    else if(e.target.id == "pastDaily-page")
-    {
-        var page = Navi.getCurrentPage();
-        gmdl_startMakeDailyDisplay(page.options.param1);
-	}
     else if(e.target.id == "etcData-page")
     {
         var page = Navi1.getCurrentPage();
         gmetDt_startMakeEtcData(page.options.param1);
-    }
-    else if(e.target.id == "pastEtc-page")
-    {
-        var page = Navi.getCurrentPage();
-        gmet_startMakeEtc(page.options.param1);
-    }
-    else if(e.target.id == "backRank-page")
-    {
-        gmrk_startMakeRankDisplay_back();
-    }
-    else if(e.target.id == "backDaily-page")
-    {
-        gmdl_startMakeDailyDisplay_back();
     }
     else if(e.target.id == "etcChm1-page")
     {
@@ -147,21 +93,5 @@ document.addEventListener("pageinit", function(e)
         gmetChm3_startChemistry(page.options.param1, page.options.param2, page.options.param3);
     }
 
-
-
-//	if (e.target.id == "my-page")
-//	{
-//		  manageDailyTbl(function(rslt){ CB_makeDailyTbl_forDisp(rslt) });
-//	}
-//	else if(e.target.id == "detailPage")
-//	{
-//		  var page = dailyNavi.getCurrentPage();
-//		  makeDetailTbl(page.options.param1);
-//	}
-//	else if(e.target.id == "ranking-page")
-//	{
-////	  makeRankTbl();
-//		  manageRankTbl(function(rslt){ CB_makeRankTbl_forDisp(rslt); });
-//	}
 }, false);
 

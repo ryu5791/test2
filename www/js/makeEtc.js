@@ -128,7 +128,11 @@ function lmet_makeEtc(scoreTbl_date)
                             "<br>" +
                             "<input type='button' id='mdlUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='中逆転'>" +
                             "<br>" +
-                            "<input type='button' id='failUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='大逆転まであと一歩'>" +
+                            "<input type='button' id='failUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='危うく大逆転'>" +
+                            "<br>" +
+                            "<input type='button' id='allKeep' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='オールキープ'>" +
+                            "<br>" +
+                            "<input type='button' id='allBreak' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='オールブレイク'>" +
                             "<br>" +
                             "<input type='button' id='chemistry' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='相性'>" +
                             "<br>" +
@@ -156,6 +160,8 @@ function lmet_btn(btn)
         case 'bigUpset':
         case 'mdlUpset':
         case 'failUpset':
+        case 'allKeep':
+        case 'allBreak':
             options = {param1: btn};
             Navi1.pushPage("pageEtcData.html", options);
             break;

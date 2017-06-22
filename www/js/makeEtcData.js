@@ -5,7 +5,6 @@
 
 /** グローバル変数宣言
 -------------------------------------*/
-/* ※makeEtc.jsのグローバル変数を使用 */
 
 
 
@@ -20,24 +19,130 @@
 function gmetDt_startMakeEtcData( btn )
 {
     var disp_score_tbl = new Array();
+    var sort_tbl = new Array();
+    var title = "";
+    var memo = "";
+
+
     switch(btn.id)
     {
         case 'bigUpset':
             disp_score_tbl = lmetDt_get_bigUpset();
+            title = "大逆転";
+            memo = "0-3から逆転した試合です！";
             break;
         case 'mdlUpset':
             disp_score_tbl = lmetDt_get_mdlUpset();
+            title = "中逆転";
+            memo = "1-3から逆転した試合です^^";
             break;
         case 'failUpset':
             disp_score_tbl = lmetDt_get_failUpset();
+            title = "逆転回避";
+            memo = "0-3から追いつかれたけどなんとか勝った試合です";
+            break;
+        case 'allKeep':
+            disp_score_tbl = lmetDt_get_allKeep();
+            title = "全キープ";
+            memo = "全ゲームキープのプロっぽい試合です";
+            break;
+        case 'allBreak':
+            disp_score_tbl = lmetDt_get_allBreak();
+            title = "全ブレイク";
+            memo = "全ゲームブレイクの〇〇試合です";
             break;
     }
-    
+
     disp_score_tbl.count = disp_score_tbl.length;
     disp_score_tbl = gmps_addName( disp_score_tbl, gbl_makeEtc_memberTbl );
-    
-    lmetDt_DailyDtlDisplay( disp_score_tbl, "大逆転" );
+    sort_tbl = lmetDt_get_sort_tbl( disp_score_tbl );
+    sort_tbl.count = sort_tbl.length;
+    sort_tbl = gmps_addName( sort_tbl, gbl_makeEtc_memberTbl );
+
+    lmetDt_DailyDtlDisplay( disp_score_tbl, title, memo, sort_tbl );
 }
+
+
+/**
+ * @brief   回数の多い人順にソート
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmetDt_get_sort_tbl( disp_score_tbl )
+{
+    var sortTbl = new Array();
+    var index;
+
+
+    // 回数集計
+    for(var i=0; i<disp_score_tbl.count; i++)
+    {
+        if(disp_score_tbl[i].gamePt == 5)       // 勝ちならば
+        {
+            index = lmetDt_id_exist(disp_score_tbl[i].ID, sortTbl);
+            if( index == DATA_NON )
+            {   // idがテーブルに存在しないなら
+                index = sortTbl.length;
+                sortTbl[index] = new lmetDt_set_sortTbl( disp_score_tbl[i].ID );
+            }
+            sortTbl[index].num++;
+        }
+    }
+    
+    // ソート
+    for(var i=0; i<sortTbl.length-1;i++)
+	{
+		for(var j=sortTbl.length-1; j>i;j--)
+		{
+			if(sortTbl[j].num>sortTbl[j-1].num)
+			{
+				var t = sortTbl[j];
+				sortTbl[j]=sortTbl[j-1];
+				sortTbl[j-1]=t;
+			}
+		}
+	}
+    
+    return sortTbl;
+}
+
+/**
+ * @brief   id有無判定（ソートテーブル）
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmetDt_id_exist(id, sortTbl)
+{
+    var ret = DATA_NON;
+    
+    for(var i=0; i<sortTbl.length; i++)
+    {
+        if(id == sortTbl[i].ID)
+        {
+            ret = i;
+            break;
+        }
+    }
+    
+    return ret;
+}
+
+
+/**
+ * @brief   ソートテーブル作成
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmetDt_set_sortTbl(id)
+{
+    this.ID = id;
+    this.num = 0;
+    this.name = "";
+}
+
 
 /***********************************************************
  * @brief   大逆転試合の取得
@@ -242,13 +347,126 @@ function lmetDt_chk_failUpset( ptr, scoreTbl_date )
 }
 
 
+/***********************************************************
+ * @brief   全ゲームキープ試合の取得
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmetDt_get_allKeep()
+{
+    var rtn_data = new Array();
+    var i,j,topIndex;
+    var scoreTbl_date;
+    
+    scoreTbl_date = gbl_makeEtc_ScoreTbl_date;
+    
+    for(i=0,j=0; i<scoreTbl_date.count; i++)
+    {
+        if(scoreTbl_date[i].gamePt == 3)
+        {
+            
+            if(lmetDt_chk_allKeep(i, scoreTbl_date)==true)
+            {
+                topIndex = (i-(i%4));
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+            }
+            i=(i+(4-(i%4)))-1;
+        }
+    }
+    return rtn_data;
+    
+}
+
+/**
+ * @brief   全ゲームキープのチェック
+ * @param    
+ * @return    
+ * @note    サーバ順にソートされていることが前提
+ **********************************************************/
+function lmetDt_chk_allKeep( ptr, scoreTbl_date )
+{
+    var rtn=false;
+    var top_ptr = (ptr-(ptr%4));    // 最初のサーバの添え字
+    
+    if ( (scoreTbl_date[top_ptr  ].serve1st == 1)           // 第1ゲーム
+      && (scoreTbl_date[top_ptr+2].serve1st == 1)           // 第3ゲーム
+      && (scoreTbl_date[top_ptr  ].serve2nd == 1)           // 第5ゲーム
+      && (scoreTbl_date[top_ptr+2].serve2nd == 1)           // 第7ゲーム
+       )
+    {
+        rtn=true;
+    }
+    
+    return rtn;
+}
+
+/***********************************************************
+ * @brief   全ゲームブレイク試合の取得
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmetDt_get_allBreak()
+{
+    var rtn_data = new Array();
+    var i,j,topIndex;
+    var scoreTbl_date;
+    
+    scoreTbl_date = gbl_makeEtc_ScoreTbl_date;
+    
+    for(i=0,j=0; i<scoreTbl_date.count; i++)
+    {
+        if(scoreTbl_date[i].gamePt == 3)
+        {
+            
+            if(lmetDt_chk_allBreak(i, scoreTbl_date)==true)
+            {
+                topIndex = (i-(i%4));
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+                rtn_data[j++] = $.extend(true, {}, scoreTbl_date[topIndex++]);
+            }
+            i=(i+(4-(i%4)))-1;
+        }
+    }
+    return rtn_data;
+}
+
+/**
+ * @brief   全ゲームブレイクのチェック
+ * @param    
+ * @return    
+ * @note    サーバ順にソートされていることが前提
+ **********************************************************/
+function lmetDt_chk_allBreak( ptr, scoreTbl_date )
+{
+    var rtn=false;
+    var top_ptr = (ptr-(ptr%4));    // 最初のサーバの添え字
+    
+    if ( (scoreTbl_date[top_ptr  ].serve1st == 0)           // 第1ゲーム
+      && (scoreTbl_date[top_ptr+2].serve1st == 0)           // 第3ゲーム
+      && (scoreTbl_date[top_ptr  ].serve2nd == 0)           // 第5ゲーム
+      && (scoreTbl_date[top_ptr+2].serve2nd == 0)           // 第7ゲーム
+       )
+    {
+        rtn=true;
+    }
+    
+    return rtn;
+}
+
 /**
  * @brief   結果表示
  * @param    
  * @return    
  * @note    
  **********************************************************/
-function lmetDt_DailyDtlDisplay(gameRslt, keyDate)
+function lmetDt_DailyDtlDisplay(gameRslt, title, msg, sort_tbl)
 {
     var dispRslt = new Array();
     var gameCount = 0;
@@ -262,11 +480,11 @@ function lmetDt_DailyDtlDisplay(gameRslt, keyDate)
     
     if( gbl_makeEtc_id_pos == 0 )
     {
-        onsListItem.innerHTML = "今期 エトセトラ";
+        onsListItem.innerHTML = "今期 " + title;
     }
     else
     {
-        onsListItem.innerHTML = gbl_makeEtc_currentTotalTbl.disp+" Etc.";
+        onsListItem.innerHTML = gbl_makeEtc_currentTotalTbl.disp+" "+title;
     }
 
     onsList.appendChild(onsListItem);
@@ -279,11 +497,15 @@ function lmetDt_DailyDtlDisplay(gameRslt, keyDate)
 
     onsListItem.innerHTML = "<ons-row>" +
                             "<ons-col>" +
-                            "<header>"+keyDate +"  試合数：" + (gameRslt.length/4) +
+                            "<header>" +
+                            "●"+msg+"<br>"+
+                            "</header>" +
+                            "<header>" +"  試合数：" + (gameRslt.length/4) +
                             "</header>" +
                             "<header>" +"----------------------------------------"+
                             "</header>" +
-                            "<header  style='font-size: 14px'>"+"※下記クリックで試合詳細表示" +
+                            "<header  style='font-size: 14px'>"+
+                            "※下記クリックで試合詳細表示" +
                             "</header>" +
                             "</ons-col>"+
                             "</ons-row>";
@@ -360,6 +582,38 @@ function lmetDt_DailyDtlDisplay(gameRslt, keyDate)
             });
         })(i);
     }
+    
+    // 順位表示
+    //----------------------------------
+    var rank = 1;
+    onsListItem = document.createElement("etcData-list");
+    onsListItem.innerHTML = "----------------------------------------<br>";
+    onsList.appendChild(onsListItem);
+    ons.compile(onsListItem);
+
+    for(var i=0; (i<3)&&(i<sort_tbl.length); i++, rank++)
+    {
+        onsListItem = document.createElement("etcData-list");
+        onsListItem.innerHTML = "　" + rank + "位 　"
+                                + sort_tbl[i].name + "さん　"
+                                + sort_tbl[i].num + "回<br>";
+
+        // 次の人も回数が同じなら表示させる
+        while((i<sort_tbl.length-1)&&(sort_tbl[i].num == sort_tbl[i+1].num))
+        {
+            i++;
+            rank++;
+            onsListItem.innerHTML += ("　　　　" + sort_tbl[i].name + "さん<br>");
+        }
+        onsList.appendChild(onsListItem);
+        ons.compile(onsListItem);
+    }
+    
+    onsListItem = document.createElement("etcData-list");
+    onsListItem.innerHTML = "<br>※勝ったほうの回数になります";
+    onsList.appendChild(onsListItem);
+    ons.compile(onsListItem);
+    
 }
 
 

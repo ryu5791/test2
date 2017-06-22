@@ -113,7 +113,7 @@ function lmet_getPairData(id, start_index, id_num)
         if( gameNum != 0 )
         {
             pairInfo[ptr] = new lmet_setPairInfo(
-                            					scoreTbl[j].pairID,
+                                				scoreTbl[j].pairID,
 									            gbl_makeEtc_rankTbl[i].gross,
 									            gbl_makeEtc_rankTbl[i].name,
 									            gameNum,
@@ -300,7 +300,7 @@ function lmet_makeChemistryDisplay(pairInfo, name)
 	ons.compile(onsListItem);
 
     // 規定試合到達者の表の項目表示
-    onsListItem = document.createElement("rank-list");
+    onsListItem = document.createElement("etcChm2-list");
 	onsListItem.innerHTML = "●規定試合を満たす人との相性" +
                             "<table	 border='1' cellspacing='0'>"+
 							"<tr>" +
@@ -330,7 +330,7 @@ function lmet_makeChemistryDisplay(pairInfo, name)
     }
 
     // 規定試合未到達者の表の項目表示
-    onsListItem = document.createElement("rank-list");
+    onsListItem = document.createElement("etcChm2-list");
     onsListItem.innerHTML = "<BR>●規定試合未満の人との相性" +
                             "<table	 border='1' cellspacing='0'>"+
 							"<tr>" +
@@ -346,7 +346,7 @@ function lmet_makeChemistryDisplay(pairInfo, name)
     // 規定試合未到達者の表のデータ表示
     for( var i=0, j=pairInfo.validNum; ((j<pairInfo.length) && (i<gbl_makeEtc_currentTotalTbl.ChNum)); i++, j++)
     {
-        onsListItem = document.createElement("rank-list");
+        onsListItem = document.createElement("etcChm2-list");
         onsListItem.innerHTML = "<table     border='1' cellspacing='0'>"+
     							"<tr>" +
     							"<th width='60' id=nameCell" + j + ">"+pairInfo[j].name+"</th>" +
@@ -367,6 +367,41 @@ function lmet_makeChemistryDisplay(pairInfo, name)
 			});
 		})(i);
 	}
+    
+    
+    // その他説明等表示
+	onsListItem = document.createElement("etcChm2-list");
+	onsListItem.innerHTML = "<header>"+ "gm:試合数" + "</header>"+
+							"<header>"+ "win:勝利数" + "</header>"+
+                            "<header>"+ "上位" +gbl_makeEtc_currentTotalTbl.ChNum + "名まで表示しています" + "</header>";
+	onsList.appendChild(onsListItem);
+	ons.compile(onsListItem);
+
+    // その他説明等表示
+    onsListItem = document.createElement("etcChm2-list");
+	onsListItem.innerHTML = '<div style="font-size: 14px">' +
+                                '<br>※相性度について'+
+                                '<br>'+
+                                '・ペアとのグロスより結果が良ければ相性度は高くなります'+
+                                '<br>'+
+                                '・相性度が5ならばグロスから予想されるスコア通りの結果が出ていることになります'+
+                                '<br>'+
+                                '・奪われたゲーム数も加味されています。'+
+                                '<br>'+
+                                '　(5-3で勝つより5-0で勝つほうが相性度は高い)'+
+                                '<br>'+
+                                '・計算式='+
+                                '<br>'+
+                                '　(2人の平均得失点差)-(グロスによる平均得失点差)+5'+
+                                '</div>';
+
+    
+    "<header>"+ "gm:試合数" + "</header>"+
+							"<header>"+ "win:勝利数" + "</header>"+
+                            "<header>"+ "上位" +gbl_makeEtc_currentTotalTbl.ChNum + "名まで表示しています" + "</header>";
+	onsList.appendChild(onsListItem);
+	ons.compile(onsListItem);
+
 
 }
 
