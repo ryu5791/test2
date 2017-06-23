@@ -19,7 +19,7 @@
 function gmetDt_startMakeEtcData( btn )
 {
     var disp_score_tbl = new Array();
-    var sort_tbl = new Array();
+    var sort_tbl = new Object();
     var title = "";
     var memo = "";
 
@@ -56,8 +56,10 @@ function gmetDt_startMakeEtcData( btn )
     disp_score_tbl.count = disp_score_tbl.length;
     disp_score_tbl = gmps_addName( disp_score_tbl, gbl_makeEtc_memberTbl );
     sort_tbl = lmetDt_get_sort_tbl( disp_score_tbl );
-    sort_tbl.count = sort_tbl.length;
-    sort_tbl = gmps_addName( sort_tbl, gbl_makeEtc_memberTbl );
+    sort_tbl.win.count = sort_tbl.win.length;
+    sort_tbl.win = gmps_addName( sort_tbl.win, gbl_makeEtc_memberTbl );
+    sort_tbl.lose.count = sort_tbl.lose.length;
+    sort_tbl.lose = gmps_addName( sort_tbl.lose, gbl_makeEtc_memberTbl );
 
     lmetDt_DailyDtlDisplay( disp_score_tbl, title, memo, sort_tbl );
 }
@@ -71,38 +73,41 @@ function gmetDt_startMakeEtcData( btn )
  **********************************************************/
 function lmetDt_get_sort_tbl( disp_score_tbl )
 {
-    var sortTbl = new Array();
+    var sortTbl = new Object();
     var index;
 
+    sortTbl.win = new Array();
+    sortTbl.lose = new Array();
 
     // 回数集計
     for(var i=0; i<disp_score_tbl.count; i++)
     {
-        if(disp_score_tbl[i].gamePt == 5)       // 勝ちならば
-        {
-            index = lmetDt_id_exist(disp_score_tbl[i].ID, sortTbl);
+        if(disp_score_tbl[i].gamePt == 5)
+        {   // 勝ちの集計
+            index = lmetDt_id_exist(disp_score_tbl[i].ID, sortTbl.win);
             if( index == DATA_NON )
             {   // idがテーブルに存在しないなら
-                index = sortTbl.length;
-                sortTbl[index] = new lmetDt_set_sortTbl( disp_score_tbl[i].ID );
+                index = sortTbl.win.length;
+                sortTbl.win[index] = new lmetDt_set_sortTbl( disp_score_tbl[i].ID );
             }
-            sortTbl[index].num++;
+            sortTbl.win[index].num++;
         }
+        else
+        {   // 負けの集計
+            index = lmetDt_id_exist(disp_score_tbl[i].ID, sortTbl.lose);
+            if( index == DATA_NON )
+            {   // idがテーブルに存在しないなら
+                index = sortTbl.lose.length;
+                sortTbl.lose[index] = new lmetDt_set_sortTbl( disp_score_tbl[i].ID );
+            }
+            sortTbl.lose[index].num++;
+        }
+
     }
-    
-    // ソート
-    for(var i=0; i<sortTbl.length-1;i++)
-	{
-		for(var j=sortTbl.length-1; j>i;j--)
-		{
-			if(sortTbl[j].num>sortTbl[j-1].num)
-			{
-				var t = sortTbl[j];
-				sortTbl[j]=sortTbl[j-1];
-				sortTbl[j-1]=t;
-			}
-		}
-	}
+
+    sortTbl.win = lmetDt_tbl_sort(sortTbl.win);
+    sortTbl.lose = lmetDt_tbl_sort(sortTbl.lose);
+
     
     return sortTbl;
 }
@@ -129,6 +134,30 @@ function lmetDt_id_exist(id, sortTbl)
     return ret;
 }
 
+/**
+ * @brief   テーブルをソート
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmetDt_tbl_sort(sortTbl)
+{
+    // ソート
+    for(var i=0; i<sortTbl.length-1;i++)
+    {
+		for(var j=sortTbl.length-1; j>i;j--)
+		{
+			if(sortTbl[j].num>sortTbl[j-1].num)
+			{
+				var t = sortTbl[j];
+				sortTbl[j]=sortTbl[j-1];
+				sortTbl[j-1]=t;
+			}
+		}
+	}
+    
+    return sortTbl;
+}
 
 /**
  * @brief   ソートテーブル作成
@@ -585,11 +614,35 @@ function lmetDt_DailyDtlDisplay(gameRslt, title, msg, sort_tbl)
     
     // 順位表示
     //----------------------------------
-    var rank = 1;
     onsListItem = document.createElement("etcData-list");
-    onsListItem.innerHTML = "----------------------------------------<br>";
+    onsListItem.innerHTML = "----------------------------------------<br>"
+                            + "●勝った回数<br>";
     onsList.appendChild(onsListItem);
     ons.compile(onsListItem);
+
+    lmetDt_disp_sort(sort_tbl.win);
+
+    onsListItem = document.createElement("etcData-list");
+    onsListItem.innerHTML = "----------------------------------------<br>"
+                            + "●負けた回数<br>";
+    onsList.appendChild(onsListItem);
+    ons.compile(onsListItem);
+
+    lmetDt_disp_sort(sort_tbl.lose);
+    
+}
+
+/**
+ * @brief   ソート結果表示
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmetDt_disp_sort(sort_tbl)
+{
+    var rank = 1;
+    var onsList = document.getElementById('etcData-list');
+    var onsListItem = document.createElement("etcData-list");
 
     for(var i=0; (i<3)&&(i<sort_tbl.length); i++, rank++)
     {
@@ -609,11 +662,7 @@ function lmetDt_DailyDtlDisplay(gameRslt, title, msg, sort_tbl)
         ons.compile(onsListItem);
     }
     
-    onsListItem = document.createElement("etcData-list");
-    onsListItem.innerHTML = "<br>※勝ったほうの回数になります";
-    onsList.appendChild(onsListItem);
-    ons.compile(onsListItem);
-    
+
 }
 
 

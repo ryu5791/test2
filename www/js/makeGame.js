@@ -181,58 +181,73 @@ function lmgm_get_dispGameScore(rslt)
 function lmgm_get_columnGame(rslt, col)
 {
     var ret = MGM_GAME_RESULT_EMPTY;
-    
-    for(var i=0; i<4; i++)
+
+    if( (col == (MGM_GAME_MAX-1))           // 7ゲーム目（タイブレも考慮）
+      &&((rslt[0].gamePt+rslt[2].gamePt)==8) )
     {
-        if((col%4)==(rslt[i].serveTurn-1))     // サーブ順が一致
+        if(rslt[0].gamePt == 5)
         {
-            if(col<4)                       // サーブ一巡目
+            ret = MGM_GAME_RESULT_UP;
+        }
+        else
+        {
+            ret = MGM_GAME_RESULT_DN;
+        }
+    }
+    else
+    {
+        for(var i=0; i<4; i++)
+        {
+            if((col%4)==(rslt[i].serveTurn-1))     // サーブ順が一致
             {
-                if(i<2)                     // 上段
+                if(col<4)                       // サーブ一巡目
                 {
-                    if(rslt[i].serve1st==1)
+                    if(i<2)                     // 上段
                     {
-                        ret = MGM_GAME_RESULT_UP;
+                        if(rslt[i].serve1st==1)
+                        {
+                            ret = MGM_GAME_RESULT_UP;
+                        }
+                        else if(rslt[i].serve1st==0)
+                        {
+                            ret = MGM_GAME_RESULT_DN;
+                        }
                     }
-                    else if(rslt[i].serve1st==0)
+                    else                        // 下段
                     {
-                        ret = MGM_GAME_RESULT_DN;
+                        if(rslt[i].serve1st==1)
+                        {
+                            ret = MGM_GAME_RESULT_DN;
+                        }
+                        else if(rslt[i].serve1st==0)
+                        {
+                            ret = MGM_GAME_RESULT_UP;
+                        }
                     }
                 }
-                else                        // 下段
+                else                            // サーブ２巡目
                 {
-                    if(rslt[i].serve1st==1)
+                    if(i<2)                     // 上段
                     {
-                        ret = MGM_GAME_RESULT_DN;
+                        if(rslt[i].serve2nd==1)
+                        {
+                            ret = MGM_GAME_RESULT_UP;
+                        }
+                        else if(rslt[i].serve2nd==0)
+                        {
+                            ret = MGM_GAME_RESULT_DN;
+                        }
                     }
-                    else if(rslt[i].serve1st==0)
+                    else                        // 下段
                     {
-                        ret = MGM_GAME_RESULT_UP;
-                    }
-                }
-            }
-            else                            // サーブ２巡目
-            {
-                if(i<2)                     // 上段
-                {
-                    if(rslt[i].serve2nd==1)
-                    {
-                        ret = MGM_GAME_RESULT_UP;
-                    }
-                    else if(rslt[i].serve2nd==0)
-                    {
-                        ret = MGM_GAME_RESULT_DN;
-                    }
-                }
-                else                        // 下段
-                {
-                    if(rslt[i].serve2nd==1)
-                    {
-                        ret = MGM_GAME_RESULT_DN;
-                    }
-                    else if(rslt[i].serve2nd==0)
-                    {
-                        ret = MGM_GAME_RESULT_UP;
+                        if(rslt[i].serve2nd==1)
+                        {
+                            ret = MGM_GAME_RESULT_DN;
+                        }
+                        else if(rslt[i].serve2nd==0)
+                        {
+                            ret = MGM_GAME_RESULT_UP;
+                        }
                     }
                 }
             }
