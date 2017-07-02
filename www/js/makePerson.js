@@ -5,10 +5,15 @@
 
 /** グローバル変数宣言
 -------------------------------------*/
-var gbl_makePerson_id;
+var gbl_makePerson_dt;
 var gbl_makePerson_memberRslt;
 var gbl_makePerson_scoreRslt;
+var gbl_makePerson_disp_order;
 
+/** 定数宣言
+-------------------------------------*/
+const ORDER_ASCENDING = 0;      // データ昇順
+const ORDER_DESCENDING = 1;
 
 /***********************************************************
  ===========================================================
@@ -20,7 +25,8 @@ var gbl_makePerson_scoreRslt;
  **********************************************************/
 function gmps_startPersonDisplay(personRslt)
 {
-    gbl_makePerson_id = personRslt.ID;
+    gbl_makePerson_dt = personRslt;
+    gbl_makePerson_disp_order = ORDER_ASCENDING;
     gnmt_getAsMemberTbl(function(rslt){ lmps_start2PersonDisplay(rslt) });
 }
 
@@ -45,7 +51,7 @@ function lmps_start2PersonDisplay(rslt)
 function lmps_start3PersonDisplay(rslt)
 {
     gbl_makePerson_scoreRslt = $.extend(true, {}, rslt);
-    lmps_makePersonTbl(gbl_makePerson_id, gbl_makePerson_memberRslt, gbl_makePerson_scoreRslt);
+    lmps_makePersonTbl(gbl_makePerson_dt.ID, gbl_makePerson_memberRslt, gbl_makePerson_scoreRslt);
 }
 
 /***********************************************************
@@ -195,8 +201,8 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
     var onsListItem = document.createElement("person-list");
     onsListItem.innerHTML = "<ons-row>" +
                             "<ons-col>" +
-                            "<header>"+dispName + "さん　試合数：" + dateGameNoRslt.count +
-                            "</header>" +
+                            dispName + "さん　試合数：" + dateGameNoRslt.count + 
+                            '    ' + lmps_dispOrderBtn() + "<br>"+
                             "<header>" +"----------------------------------------"+
                             "</header>" +
                             "<header  style='font-size: 14px'>"+"※下記クリックで試合詳細表示" +
@@ -206,8 +212,32 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
     onsList.appendChild(onsListItem);
     ons.compile(onsListItem);
 
-    for(var i=0; i<gameRslt.count; i++)
+    if(gbl_makePerson_disp_order!=ORDER_ASCENDING)
+    {   // 降順
+        var temp = new Object();
+        for(var i=0; i<dateGameNoRslt.count/2; i++)
+        {
+            temp = dateGameNoRslt[i];
+            dateGameNoRslt[i] = dateGameNoRslt[dateGameNoRslt.count-1-i];
+            dateGameNoRslt[dateGameNoRslt.count-1-i] = temp;
+        }
+    }
+
+
+
+    for(var j=0; j<gameRslt.count; j++)
     {
+        var i;
+        if(gbl_makePerson_disp_order==ORDER_ASCENDING)
+        {   // 昇順
+            i=j;
+        }
+        else
+        {   // 降順     (8,9,10,11, 4,5,6,7, ・・・ という風に進める)
+            i=gameRslt.count-j-1;
+            i=(i-(i%4)) + 3-(i%4);
+        }
+        
         if(i%4==0)
         {
             dispRslt[gameCount] = new Array();
@@ -279,13 +309,66 @@ function lmps_PersonDisplay( gameRslt, dateGameNoRslt, dispName )
     {
         (function (n) {
             $("#detailRow" + i).click(function(){
-                gmgm_gameDetailDisplay("["+(n+1)+"] ", dispRslt[n]);
+                if(gbl_makePerson_disp_order==ORDER_ASCENDING)
+                {
+                    gmgm_gameDetailDisplay("["+(n+1)+"] ", dispRslt[n]);
+                }
+                else
+                {
+                    gmgm_gameDetailDisplay("["+(n+1)+"] ", dispRslt[dateGameNoRslt.count-n-1]);
+                }
             });
         })(i);
     }
+
 }
 
 
+/**
+ * @brief   ボタン表示
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmps_dispOrderBtn()
+{
+    var btn;
+    var str =  "<input type='button' onclick='lmps_chgOrder()' style=' position: absolute; right:5%' value=";
 
+    if(gbl_makePerson_disp_order==ORDER_ASCENDING)
+    {
+        btn = '順番変更▼';
+    }
+    else
+    {
+        btn = '順番変更▲';
+    }
 
+    str = str + btn + ">";
 
+    return str;
+    
+}
+
+/**
+ * @brief   順番変更
+ * @param    
+ * @return    
+ * @note    
+ **********************************************************/
+function lmps_chgOrder()
+{
+    if(gbl_makePerson_disp_order==ORDER_ASCENDING)
+    {
+        gbl_makePerson_disp_order = ORDER_DESCENDING;
+    }
+    else
+    {
+        gbl_makePerson_disp_order = ORDER_ASCENDING;
+    }
+
+    $("person-list").empty();                       // 表示削除
+    
+    lmps_start2PersonDisplay(gbl_makePerson_memberRslt);    // 再描画
+
+}

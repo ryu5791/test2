@@ -24,6 +24,7 @@ function gmetChm1_startChemistry()
 	.fetchAll()
 	.then(function(rslt){
         gbl_makeEtc_rankTbl = $.extend( true, {}, rslt );
+        gbl_makeEtc_rankTbl.length = gbl_makeEtc_rankTbl.count;
     	thrGameNum = gmrk_getGameNumAvg( gbl_makeEtc_rankTbl );						// 閾値取得
 		gbl_makeEtc_rankTbl = gmrk_sortRankData(gbl_makeEtc_rankTbl, thrGameNum);	// データソート
         lmetChm1_chemistry_disp();
@@ -74,7 +75,7 @@ function lmetChm1_chemistry_disp()
     {
         onsEtc = document.getElementById('etcChm1-list');
         onsEtcItem = document.createElement("etcChm1-list");
-        onsEtcItem.innerHTML =  "<span style = 'line-height:150%'>" +
+        onsEtcItem.innerHTML =  "<span style = 'line-height:200%'>" +
                                 "<input type='button' id='etcChm1_name" + i + "'" +
                                 " onclick='lmetChm1_btn("+i+")' style='WIDTH: 40%; position: absolute; left:5%'" + 
                                 "value=" + rankTbl[i].name + ">" +

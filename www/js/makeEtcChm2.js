@@ -36,7 +36,6 @@ function lmetChm2_chemistry_rslt(index)
     var id_num=0;
     var pairInfo = new Object();
     var str="";
-
     // 該当するIDの総試合数
     for(var i=0; i<gbl_makeEtc_ScoreTbl_id.count; i++)
     {
@@ -55,19 +54,6 @@ function lmetChm2_chemistry_rslt(index)
     // 表示
     lmet_makeChemistryDisplay(pairInfo, rankTbl[index].name);
     
-
-/*    alert("length:" + pairInfo.length);
-    
-    for(var i=0; i<pairInfo.length; i++ )
-    {
-        str += (pairInfo[i].name + ",");
-        str += (pairInfo[i].gameNum + ",");
-        str += (pairInfo[i].winNum + ",");
-        str += ((pairInfo[i].chemPt).toFixed(3) + "\n");
-    }
-
-    alert(":" + str);
-*/
 }
 
 /***********************************************************
@@ -112,8 +98,9 @@ function lmet_getPairData(id, start_index, id_num)
         // 一度でも組んだことがあれば戻り値の配列に追加
         if( gameNum != 0 )
         {
+
             pairInfo[ptr] = new lmet_setPairInfo(
-                                				scoreTbl[j].pairID,
+                                				gbl_makeEtc_rankTbl[i].ID,
 									            gbl_makeEtc_rankTbl[i].gross,
 									            gbl_makeEtc_rankTbl[i].name,
 									            gameNum,
@@ -126,7 +113,6 @@ function lmet_getPairData(id, start_index, id_num)
             ptr++;
         }
     }
-
     // 相性度順にソート
     pairInfo = lmet_sortChmData(pairInfo);
     

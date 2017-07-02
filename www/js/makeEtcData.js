@@ -38,8 +38,8 @@ function gmetDt_startMakeEtcData( btn )
             break;
         case 'failUpset':
             disp_score_tbl = lmetDt_get_failUpset();
-            title = "逆転回避";
-            memo = "0-3から追いつかれたけどなんとか勝った試合です";
+            title = "惜逆転";
+            memo = "0-3から追いついたけど結局負けた試合です";
             break;
         case 'allKeep':
             disp_score_tbl = lmetDt_get_allKeep();
@@ -529,7 +529,7 @@ function lmetDt_DailyDtlDisplay(gameRslt, title, msg, sort_tbl)
                             "<header>" +
                             "●"+msg+"<br>"+
                             "</header>" +
-                            "<header>" +"  試合数：" + (gameRslt.length/4) +
+                            "<header>" +"  試合数：" + (gameRslt.length/4) + " / " +(gbl_makeEtc_ScoreTbl_id.count/4)
                             "</header>" +
                             "<header>" +"----------------------------------------"+
                             "</header>" +

@@ -23,6 +23,14 @@ var gbl_makeEtc_rankTbl;
  **********************************************************/
 function gmet_startMakeEtc(id_pos)
 {
+    var onsEtc = document.getElementById('etc-list');
+    var onsEtcItem = document.createElement("etc-list");
+
+    onsEtcItem.innerHTML =  "※データ収集中です。<br>しばらくお待ちください。。" ;
+
+    onsEtc.appendChild(onsEtcItem);
+    ons.compile(onsEtcItem);
+
     gbl_makeEtc_id_pos = id_pos;
     gntt_getAsTotalManageTbl(gbl_makeEtc_id_pos, function(rslt){gmet_start2MakeEtc(rslt)});
     
@@ -77,6 +85,7 @@ function gmet_start4MakeEtc(rslt)
  **********************************************************/
 function lmet_makeEtc(scoreTbl_date)
 {
+    $("etc-list").empty();
     gbl_makeEtc_ScoreTbl_id = $.extend( true, {}, scoreTbl_date );
 
 //    lmet_chemistry_chk();
@@ -128,7 +137,7 @@ function lmet_makeEtc(scoreTbl_date)
                             "<br>" +
                             "<input type='button' id='mdlUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='中逆転'>" +
                             "<br>" +
-                            "<input type='button' id='failUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='危うく大逆転'>" +
+                            "<input type='button' id='failUpset' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='大逆転まであと一歩'>" +
                             "<br>" +
                             "<input type='button' id='allKeep' onclick='lmet_btn(this)' style='WIDTH: 90%; position: absolute; left:5%' value='オールキープ'>" +
                             "<br>" +

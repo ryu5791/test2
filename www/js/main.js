@@ -1,13 +1,13 @@
 //mobile backendのAPIキーを設定
 //↓本番
-//var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
+var ncmb = new NCMB("bb0194930176053bea3ec03024dc1962234cb96d0b372352234b17e25f525a9e","8960c3d8602554b25f6eb59a117ac883ee26a245eaab5553eecd610eea450ba0");
 //↓テスト
-var ncmb = new NCMB("9aa42fae63cd02970831cab4933f2819f4e83c9b3b21c810ec7d7403a21c1250","3e491d5ac914c76d1d2b1d6deef65f76f368c62f55df1e568a77675644040b36");
+//var ncmb = new NCMB("9aa42fae63cd02970831cab4933f2819f4e83c9b3b21c810ec7d7403a21c1250","3e491d5ac914c76d1d2b1d6deef65f76f368c62f55df1e568a77675644040b36");
 
 
 /** 定数宣言
 -------------------------------------*/
-const VER_NO = "ver 0.70.02";
+const VER_NO = "ver 0.80.00";
 
 // ゲーム数、人数 //
 const GAME_WIN_POINT = 4;

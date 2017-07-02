@@ -24,6 +24,14 @@ var gbl_makeDaily_id_pos;
  **********************************************************/
 function gmdl_startMakeDailyDisplay(id_pos)
 {
+    var onsEtc = document.getElementById('daily-list');
+    var onsEtcItem = document.createElement("daily-list");
+
+    onsEtcItem.innerHTML =  "※データ収集中です。<br>しばらくお待ちください。。" ;
+
+    onsEtc.appendChild(onsEtcItem);
+    ons.compile(onsEtcItem);
+
     gbl_makeDaily_id_pos = id_pos;
     gntt_getAsTotalManageTbl(id_pos, function(rslt){gmdl_start2MakeDailyDisplay(rslt)});
 }
@@ -283,6 +291,7 @@ function lmdl_getAsDailyTblFromDtbs()
  **********************************************************/
 function lmdl_makeDailyDisplay(dailyRslt)
 {
+    $("daily-list").empty();
     // タイトル表示
     //----------------------------------
     var onsList = document.getElementById('daily-toolbar');
@@ -321,11 +330,11 @@ function lmdl_makeDailyDisplay(dailyRslt)
 
     // 表の表示
     //----------------------------------
-
     var onsList = document.getElementById('daily-list');
+    var onsListItem;
     for( var i = 0; i< dailyRslt.length; i++ )
     {
-        var onsListItem = document.createElement("daily-list");
+        onsListItem = document.createElement("daily-list");
         onsListItem.innerHTML = "<ons-row id = dailyRow"+i+">" +
                                     "<ons-col>"+
                                         "<header>"+dailyRslt[i].date

@@ -28,6 +28,14 @@ var gbl_makeRank_id_pos;
  **********************************************************/
 function gmrk_startMakeRankDisplay(id_pos)
 {
+    var onsEtc = document.getElementById('rank-list');
+    var onsEtcItem = document.createElement("rank-list");
+
+    onsEtcItem.innerHTML =  "※データ収集中です。<br>しばらくお待ちください。。" ;
+
+    onsEtc.appendChild(onsEtcItem);
+    ons.compile(onsEtcItem);
+
     gbl_makeRank_id_pos = id_pos;
     gntt_getAsTotalManageTbl(id_pos, function(rslt){lmrk_start2MakeRankDisplay(rslt)});
 }
@@ -147,31 +155,88 @@ function lmrk_startMakeAsRankTbl()
  **********************************************************/
 function lmrk_addUpAsRankTbl( tblInfo, memberRslt, scoreRslt )
 {
-	do{
-		tblInfo.gameNum++;									// 試合数
-		tblInfo.pt += scoreRslt[tblInfo.ptrNum].gamePt;		// ポイント
-		if( scoreRslt[tblInfo.ptrNum].gamePt == 5 )
-		{
-			tblInfo.winNum++;								// 勝利数
-		}
-		tblInfo.ptrNum++;
-		// ID変化あり、または終了時はデータベースへ保存
-		if( ( tblInfo.ptrNum >= scoreRslt.count )
-		 || ( scoreRslt[tblInfo.ptrNum-1].ID != scoreRslt[tblInfo.ptrNum].ID))
-		{
-			lmrk_saveRankData( tblInfo, memberRslt, scoreRslt );
+    if(gbl_makeRank_currentTotalTbl.hideLastMonth!=true)
+    {   // 最終月無効となっていないとき
+    	do{
+    		tblInfo.gameNum++;									// 試合数
+    		tblInfo.pt += scoreRslt[tblInfo.ptrNum].gamePt;		// ポイント
+    		if( scoreRslt[tblInfo.ptrNum].gamePt == 5 )
+    		{
+    			tblInfo.winNum++;								// 勝利数
+    		}
+    		tblInfo.ptrNum++;
+    		// ID変化あり、または終了時はデータベースへ保存
+    		if( ( tblInfo.ptrNum >= scoreRslt.count )
+    		 || ( scoreRslt[tblInfo.ptrNum-1].ID != scoreRslt[tblInfo.ptrNum].ID))
+    		{
+    			lmrk_saveRankData( tblInfo, memberRslt, scoreRslt );
+    
+    			if( tblInfo.ptrNum >= scoreRslt.count )
+    			{	// 集計終了時
+                    lmrk_restoreAsTotalManageTbl_rank();
+    			}
+    			else
+    			{	// 集計継続
+    				tblInfo = lmrk_clear_tblInfo( tblInfo );
+    			}
+    		}
+    		
+    	}while(tblInfo.ptrNum < scoreRslt.count);
+    }
+    else
+    {
+        do{
+            if(lmrk_chkLastMonth(scoreRslt[tblInfo.ptrNum].date) != true)
+            {
+        		tblInfo.gameNum++;									// 試合数
+        		tblInfo.pt += scoreRslt[tblInfo.ptrNum].gamePt;		// ポイント
+        		if( scoreRslt[tblInfo.ptrNum].gamePt == 5 )
+        		{
+        			tblInfo.winNum++;								// 勝利数
+        		}
+            }
+    		tblInfo.ptrNum++;
+    		// ID変化あり、または終了時はデータベースへ保存
+    		if( ( tblInfo.ptrNum >= scoreRslt.count )
+    		 || ( scoreRslt[tblInfo.ptrNum-1].ID != scoreRslt[tblInfo.ptrNum].ID))
+    		{
+    			lmrk_saveRankData( tblInfo, memberRslt, scoreRslt );
+    
+    			if( tblInfo.ptrNum >= scoreRslt.count )
+    			{	// 集計終了時
+                    lmrk_restoreAsTotalManageTbl_rank();
+    			}
+    			else
+    			{	// 集計継続
+    				tblInfo = lmrk_clear_tblInfo( tblInfo );
+    			}
+    		}
+    		
+    	}while(tblInfo.ptrNum < scoreRslt.count);
+        
+    }
+}
 
-			if( tblInfo.ptrNum >= scoreRslt.count )
-			{	// 集計終了時
-                lmrk_restoreAsTotalManageTbl_rank();
-			}
-			else
-			{	// 集計継続
-				tblInfo = lmrk_clear_tblInfo( tblInfo );
-			}
-		}
-		
-	}while(tblInfo.ptrNum < scoreRslt.count);
+
+/**
+ * @brief   最終月チェック
+ * @param	
+ * @return	
+ * @note	true: 最終月
+ **********************************************************/
+function lmrk_chkLastMonth(date)
+{
+    var ret = false;
+    var str;
+    
+    str = date.substr(5,2);
+    if((str === "06") || (str === "12"))
+    {
+        ret = true;
+    }
+    
+    return ret;
+    
 }
 
 /**
@@ -200,8 +265,17 @@ function lmrk_saveRankData( tblInfo, memberRslt, scoreRslt )
 	var RankScore = ncmb.DataStore( gbl_makeRank_currentTotalTbl.rankTbl );
 	var rankScore = new RankScore();	
 
+    var grossDt = 0;
+    var netDt = 0;
+
 	tblInfo = lmrk_getMemberData( scoreRslt[tblInfo.ptrNum-1].ID, memberRslt, tblInfo );
 	
+    if(tblInfo.gameNum != 0)
+    {
+        grossDt = (+tblInfo.pt)/(+tblInfo.gameNum);
+        netDt = ((+tblInfo.pt)/(+tblInfo.gameNum)+tblInfo.HDCP);
+    }
+    
 	rankScore
 	.set("ID", scoreRslt[tblInfo.ptrNum-1].ID)
 	.set("gameNum", tblInfo.gameNum)
@@ -209,8 +283,8 @@ function lmrk_saveRankData( tblInfo, memberRslt, scoreRslt )
 	.set("winNum", tblInfo.winNum)
 	.set("name", tblInfo.dispName)
 	.set("HDCP", tblInfo.HDCP)
-	.set("gross", (+tblInfo.pt)/(+tblInfo.gameNum))
-	.set("net",((+tblInfo.pt)/(+tblInfo.gameNum)+tblInfo.HDCP))
+	.set("gross", grossDt)
+	.set("net", netDt)
 	.save()
 	.then(function(){
 	})
@@ -445,6 +519,7 @@ function lmrk_chkValidDat(gameNum, thrGameNum)
  **********************************************************/
 function lmrk_makeRankDisplay(rankRslt)
 {
+    $("rank-list").empty();
     // タイトル表示
     //----------------------------------
     var onsList = document.getElementById('rank-toolbar');
@@ -485,6 +560,17 @@ function lmrk_makeRankDisplay(rankRslt)
 
     // 表の表示
     //----------------------------------
+    if(gbl_makeRank_currentTotalTbl.hideLastMonth==true)
+    {
+        onsList = document.getElementById('rank-list');
+        onsListItem = document.createElement("rank-list");
+	    onsListItem.innerHTML = "※最終月の結果は反映されていません";
+        onsList.appendChild(onsListItem);
+	    ons.compile(onsListItem);
+        
+    }
+    
+    
     onsList = document.getElementById('rank-list');
 	onsListItem = document.createElement("rank-list");
 	// 表の項目表示
@@ -504,8 +590,8 @@ function lmrk_makeRankDisplay(rankRslt)
 	// 表のデータ表示
 	for( var i = 0; i< rankRslt.count; i++ )
 	{
-		var gross = (rankRslt[i].gamePt/rankRslt[i].gameNum).toFixed(2);
-		var a_net = ((rankRslt[i].gamePt/rankRslt[i].gameNum) + (+rankRslt[i].HDCP)).toFixed(2);
+    	var gross = (rankRslt[i].gross).toFixed(2);
+		var a_net = (rankRslt[i].net).toFixed(2);
 		var no;
 		if(i<rankRslt.validNum)
 		{
